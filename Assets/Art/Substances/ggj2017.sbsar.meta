@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: b74f709a0a7982e4fbd027d5e8f69c24
-timeCreated: 1485031559
+timeCreated: 1485035766
 licenseType: Free
 SubstanceImporter:
   serializedVersion: 5
@@ -10,13 +10,13 @@ SubstanceImporter:
     prototypeName: Brass
     shaderName: 
     shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
-    shaderKeywords: 
+    shaderKeywords: _EMISSION _METALLICGLOSSMAP _NORMALMAP _PARALLAXMAP
     renderQueue: -1
-    lightmapFlags: 5
+    lightmapFlags: 1
     inputs:
     - name: ScratchesAmount
       value:
-        scalar[0]: 3311
+        scalar[0]: 90
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
@@ -30,21 +30,21 @@ SubstanceImporter:
         texture: {instanceID: 0}
     - name: $randomseed
       value:
-        scalar[0]: 0
+        scalar[0]: 3348
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
         texture: {instanceID: 0}
     - name: ScratchesScale
       value:
-        scalar[0]: 0.25
+        scalar[0]: 0.322
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
         texture: {instanceID: 0}
     - name: DirtGrungeAmount
       value:
-        scalar[0]: 0.2
+        scalar[0]: 0
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
@@ -52,7 +52,7 @@ SubstanceImporter:
     materialInformation:
       serializedVersion: 5
       offset: {x: 0, y: 0}
-      scale: {x: 1, y: 1}
+      scale: {x: 0.5, y: 0.5}
       generateMipmaps: 1
       generateAllOutputs: 0
       animationUpdateRate: 0
@@ -432,9 +432,9 @@ SubstanceImporter:
     prototypeName: WhiteWall
     shaderName: 
     shader: {fileID: 45, guid: 0000000000000000f000000000000000, type: 0}
-    shaderKeywords: 
+    shaderKeywords: _EMISSION _NORMALMAP _PARALLAXMAP _SPECGLOSSMAP
     renderQueue: -1
-    lightmapFlags: 5
+    lightmapFlags: 1
     inputs:
     - name: $outputsize
       value:
@@ -452,7 +452,7 @@ SubstanceImporter:
         texture: {instanceID: 0}
     - name: BrickDensity
       value:
-        scalar[0]: 2
+        scalar[0]: 1
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
@@ -572,7 +572,7 @@ SubstanceImporter:
         second: 1
       - first:
           name: _Parallax
-        second: 0.02
+        second: 0.01
       - first:
           name: _SmoothnessTextureChannel
         second: 0

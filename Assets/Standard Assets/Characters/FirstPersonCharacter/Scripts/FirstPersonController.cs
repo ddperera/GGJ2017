@@ -52,10 +52,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private int m_JumpCounter;
         private bool m_Crouched;
         private bool m_Sliding;
-        private bool m_CanInterruptSlide;
         private bool m_MidStandUp;
         private float m_SlideSpeedBonus;
         private float m_StandUpPercent;
+        private bool m_CanInterruptSlide;
+        private bool m_IsSlideLocked;
 
         // Use this for initialization
         private void Start()
@@ -77,6 +78,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_MidStandUp = false;
             m_SlideSpeedBonus = 0f;
             m_StandUpPercent = (m_SlideDuration - m_StandUpDuration) / m_SlideDuration;
+            m_CanInterruptSlide = false;
         }
 
 
@@ -93,7 +95,18 @@ namespace UnityStandardAssets.Characters.FirstPerson
             // the jump state needs to read here to make sure it is not missed
             if (!m_Jump && (IsFirmlyGrounded() || m_Jumping))
             {
-                m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
+                if(m_Sliding)
+                {
+                    if(m_CanInterruptSlide)
+                    {
+                        m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
+                    }
+                }
+                else
+                {
+                    m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
+                }
+                
             }
 
             if (!m_PreviouslyGrounded && m_CharacterController.isGrounded)
@@ -129,7 +142,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private IEnumerator Slide()
         {
             m_Sliding = true;
+            m_IsSlideLocked = true;
             m_CanInterruptSlide = false;
+            bool standUpHasRun = false;
 
             for (float t = 0; t <= 1; t += Time.fixedDeltaTime / m_SlideDuration)
             {
@@ -140,17 +155,22 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     m_CanInterruptSlide = true;
                 }
 
-                if (t > m_StandUpPercent && !m_MidStandUp)
+                if (!standUpHasRun && (t > m_StandUpPercent || (m_CanInterruptSlide && m_Jump)) && !m_MidStandUp)
                 {
+                    standUpHasRun = true;
+                    m_IsSlideLocked = false;
                     StartCoroutine("StandUp");
                 }
                 yield return null;
             }
             m_Sliding = false;
+            m_CanInterruptSlide = false;
         }
 
         private IEnumerator StandUp()
         {
+            Debug.Log(transform.position.x);
+
             m_MidStandUp = true;
             Vector3 standDeltaVec = new Vector3(1.0f, 0.5f, 1.0f);
 
@@ -195,10 +215,19 @@ namespace UnityStandardAssets.Characters.FirstPerson
             desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
             desiredMove.x *= speed;
             desiredMove.z *= speed;
+
+
             if (m_CharacterController.isGrounded)
             {
-                m_MoveDir.x = desiredMove.x;
-                m_MoveDir.z = desiredMove.z;
+                if (!m_IsSlideLocked)
+                {
+                    m_MoveDir.x = desiredMove.x;
+                    m_MoveDir.z = desiredMove.z;
+                }
+                else
+                {
+                    m_MoveDir.x = desiredMove.x / 2.0f;
+                }
             }
             else
             {

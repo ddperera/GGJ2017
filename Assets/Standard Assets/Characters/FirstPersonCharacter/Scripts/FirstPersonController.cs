@@ -31,8 +31,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private float m_AirAccel;
         [SerializeField] private AnimationCurve m_SlideSpeedBonusCurve;
         [SerializeField] private float m_SlideDuration;
+        [SerializeField] private float m_StandUpDuration;
         [SerializeField] private float m_CanInterruptPercent;
-        [SerializeField] private float m_StandUpPercent;
         [SerializeField] private float m_MaxSlideSpeedBonusAmt;
 
         private Camera m_Camera;
@@ -53,7 +53,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private bool m_Crouched;
         private bool m_Sliding;
         private bool m_CanInterruptSlide;
+        private bool m_MidStandUp;
         private float m_SlideSpeedBonus;
+        private float m_StandUpPercent;
 
         // Use this for initialization
         private void Start()
@@ -72,7 +74,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_JumpCounter = 1;
             m_Crouched = false;
             m_Sliding = false;
+            m_MidStandUp = false;
             m_SlideSpeedBonus = 0f;
+            m_StandUpPercent = (m_SlideDuration - m_StandUpDuration) / m_SlideDuration;
         }
 
 
@@ -113,11 +117,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             if (CrossPlatformInputManager.GetButtonDown("Slide"))
             {
-                if (!m_Crouched && !m_Sliding)
+                if (!m_Sliding && m_CharacterController.isGrounded && !m_Jump)
                 {
                     transform.localScale = new Vector3(1.0f, 0.5f, 1.0f);
                     m_Crouched = true;
-                    //StartCoroutine("Slide");
+                    StartCoroutine("Slide");
                 }
             }
         }
@@ -136,17 +140,29 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     m_CanInterruptSlide = true;
                 }
 
-                if (t > m_StandUpPercent)
+                if (t > m_StandUpPercent && !m_MidStandUp)
                 {
                     StartCoroutine("StandUp");
                 }
                 yield return null;
             }
+            m_Sliding = false;
         }
 
         private IEnumerator StandUp()
         {
-            yield return null;
+            m_MidStandUp = true;
+            Vector3 standDeltaVec = new Vector3(1.0f, 0.5f, 1.0f);
+
+            for (float t = 0; t <= 1; t += Time.fixedDeltaTime / m_StandUpDuration)
+            {
+                standDeltaVec.y = Mathf.Lerp(0.5f, 1.0f, t);
+                transform.localScale = standDeltaVec;
+                yield return null;
+            }
+
+            transform.localScale = Vector3.one;
+            m_MidStandUp = false;
         }
 
         private bool IsFirmlyGrounded()
@@ -166,6 +182,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             float speed;
             GetInput(out speed);
+
+            speed += m_SlideSpeedBonus;
+
             // always move along the camera forward as it is the direction that it being aimed at
             Vector3 desiredMove = transform.forward*m_Input.y + transform.right*m_Input.x;
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 using UnityStandardAssets.Utility;
@@ -27,6 +28,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private AudioClip[] m_FootstepSounds;    // an array of footstep sounds that will be randomly selected from.
         [SerializeField] private AudioClip m_JumpSound;           // the sound played when character leaves the ground.
         [SerializeField] private AudioClip m_LandSound;           // the sound played when character touches back on ground.
+        [SerializeField] private float m_AirAccel;
+        [SerializeField] private AnimationCurve m_SlideSpeedBonusCurve;
+        [SerializeField] private float m_SlideDuration;
+        [SerializeField] private float m_CanInterruptPercent;
+        [SerializeField] private float m_StandUpPercent;
+        [SerializeField] private float m_MaxSlideSpeedBonusAmt;
 
         private Camera m_Camera;
         private bool m_Jump;
@@ -41,6 +48,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private float m_NextStep;
         private bool m_Jumping;
         private AudioSource m_AudioSource;
+        private bool[] m_GroundedHistory;
+        private int m_JumpCounter;
+        private bool m_Crouched;
+        private bool m_Sliding;
+        private bool m_CanInterruptSlide;
+        private float m_SlideSpeedBonus;
 
         // Use this for initialization
         private void Start()
@@ -55,6 +68,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_Jumping = false;
             m_AudioSource = GetComponent<AudioSource>();
 			m_MouseLook.Init(transform , m_Camera.transform);
+            m_GroundedHistory = new bool[] { true, true, true };
+            m_JumpCounter = 1;
+            m_Crouched = false;
+            m_Sliding = false;
+            m_SlideSpeedBonus = 0f;
         }
 
 
@@ -62,8 +80,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private void Update()
         {
             RotateView();
+
+            // update three-frame grounding history
+            m_GroundedHistory[2] = m_GroundedHistory[1];
+            m_GroundedHistory[1] = m_GroundedHistory[0];
+            m_GroundedHistory[0] = m_CharacterController.isGrounded;
+
             // the jump state needs to read here to make sure it is not missed
-            if (!m_Jump)
+            if (!m_Jump && (IsFirmlyGrounded() || m_Jumping))
             {
                 m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
             }
@@ -80,9 +104,55 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 m_MoveDir.y = 0f;
             }
 
+            if (m_CharacterController.isGrounded)
+            {
+                m_JumpCounter = 1;
+            }
+
             m_PreviouslyGrounded = m_CharacterController.isGrounded;
+
+            if (CrossPlatformInputManager.GetButtonDown("Slide"))
+            {
+                if (!m_Crouched && !m_Sliding)
+                {
+                    transform.localScale = new Vector3(1.0f, 0.5f, 1.0f);
+                    m_Crouched = true;
+                    //StartCoroutine("Slide");
+                }
+            }
         }
 
+        private IEnumerator Slide()
+        {
+            m_Sliding = true;
+            m_CanInterruptSlide = false;
+
+            for (float t = 0; t <= 1; t += Time.fixedDeltaTime / m_SlideDuration)
+            {
+                m_SlideSpeedBonus = m_SlideSpeedBonusCurve.Evaluate(t) * m_MaxSlideSpeedBonusAmt;
+
+                if (t > m_CanInterruptPercent)
+                {
+                    m_CanInterruptSlide = true;
+                }
+
+                if (t > m_StandUpPercent)
+                {
+                    StartCoroutine("StandUp");
+                }
+                yield return null;
+            }
+        }
+
+        private IEnumerator StandUp()
+        {
+            yield return null;
+        }
+
+        private bool IsFirmlyGrounded()
+        {
+            return m_GroundedHistory[0] || m_GroundedHistory[1] || m_GroundedHistory[2];
+        }
 
         private void PlayLandingSound()
         {
@@ -104,27 +174,78 @@ namespace UnityStandardAssets.Characters.FirstPerson
             Physics.SphereCast(transform.position, m_CharacterController.radius, Vector3.down, out hitInfo,
                                m_CharacterController.height/2f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
             desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
+            desiredMove.x *= speed;
+            desiredMove.z *= speed;
+            if (m_CharacterController.isGrounded)
+            {
+                m_MoveDir.x = desiredMove.x;
+                m_MoveDir.z = desiredMove.z;
+            }
+            else
+            {
+                Vector3 rawMove = new Vector3();
+                rawMove.x = m_MoveDir.x + m_AirAccel * (desiredMove.x - m_MoveDir.x);
+                rawMove.z = m_MoveDir.z + m_AirAccel * (desiredMove.z - m_MoveDir.z);
+                if (desiredMove.x > m_MoveDir.x)
+                {
+                    m_MoveDir.x = Mathf.Min(rawMove.x, desiredMove.x);
+                }
+                else
+                {
+                    m_MoveDir.x = Mathf.Max(rawMove.x, desiredMove.x);
+                }
 
-            m_MoveDir.x = desiredMove.x*speed;
-            m_MoveDir.z = desiredMove.z*speed;
-
+                if (desiredMove.z > m_MoveDir.z)
+                {
+                    m_MoveDir.z = Mathf.Min(rawMove.z, desiredMove.z);
+                }
+                else
+                {
+                    m_MoveDir.z = Mathf.Max(rawMove.z, desiredMove.z);
+                }
+            }
 
             if (m_CharacterController.isGrounded)
             {
                 m_MoveDir.y = -m_StickToGroundForce;
-
-                if (m_Jump)
-                {
-                    m_MoveDir.y = m_JumpSpeed;
-                    PlayJumpSound();
-                    m_Jump = false;
-                    m_Jumping = true;
-                }
             }
             else
             {
                 m_MoveDir += Physics.gravity*m_GravityMultiplier*Time.fixedDeltaTime;
             }
+
+            if (m_Jump)
+            {
+                m_Jump = false;
+                if (m_Jumping)
+                {
+                    switch (m_JumpCounter)
+                    {
+                        case 2:
+                            m_MoveDir.y = m_JumpSpeed;
+                            m_MoveDir.x = desiredMove.x;
+                            m_MoveDir.z = desiredMove.z;
+                            m_JumpCounter++;
+                            PlayJumpSound();
+                            break;
+                        case 3:
+                            m_MoveDir.y = m_JumpSpeed / 3.0f;
+                            m_MoveDir.x = desiredMove.x;
+                            m_MoveDir.z = desiredMove.z;
+                            m_JumpCounter++;
+                            PlayJumpSound();
+                            break;
+                    }
+                }
+                else
+                {
+                    m_MoveDir.y = m_JumpSpeed;
+                    m_JumpCounter++;
+                    PlayJumpSound();
+                    m_Jumping = true;
+                }
+            }
+
             m_CollisionFlags = m_CharacterController.Move(m_MoveDir*Time.fixedDeltaTime);
 
             ProgressStepCycle(speed);

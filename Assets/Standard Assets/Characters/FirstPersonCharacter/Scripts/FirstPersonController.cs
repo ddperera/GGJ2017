@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityStandardAssets.CrossPlatformInput;
 using UnityStandardAssets.Utility;
 using Random = UnityEngine.Random;
@@ -41,8 +42,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private float m_WallrunGravityReduction;
         [SerializeField] private float m_MaxWallrunSpeedBonus;
         [SerializeField] private float m_WallrunKickoffForce;
+		[SerializeField] private float m_WallrunVerticalKickAddition;
 
-        private Camera m_Camera;
+		private Camera m_Camera;
         private bool m_Jump;
         private float m_YRotation;
         private Vector2 m_Input;
@@ -69,16 +71,21 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private Vector3 m_WallrunNormal;
         private Vector3 m_WallrunDirectionAlongWall;
         private bool m_NeedToCheckNewWallNormal;
-        private ControllerColliderHit m_NewWallHitToCheck;
-        private float m_WallrunSpeedBonus;
+        private Vector3 m_NewWallNormalToCheck;
+		private GameObject m_NewWallObjToCheck;
+		private float m_WallrunSpeedBonus;
         private float m_lastJumpTime;
         private GameObject m_currentWallObj;
+		private Vector3 m_LastFrameVel;
+		private Vector3 m_LastFramePos;
+		private float m_WallrunVerticalKick;
+		private Text m_SpeedText;
 
 
 
 
-        // Use this for initialization
-        private void Start()
+		// Use this for initialization
+		private void Start()
         {
             m_CharacterController = GetComponent<CharacterController>();
             m_Camera = Camera.main;
@@ -101,7 +108,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_IsWallrunning = false;
             m_NeedToCheckNewWallNormal = false;
             m_lastJumpTime = Time.time;
-        }
+			m_LastFramePos = transform.position;
+			m_SpeedText = GameObject.FindWithTag("SpeedText").GetComponent<Text>();
+		}
 
 
         // Update is called once per frame
@@ -136,9 +145,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 m_MoveDir.y = 0f;
                 m_Jumping = false;
             }
-            if (!m_CharacterController.isGrounded && !m_Jumping && m_PreviouslyGrounded)
+			RaycastHit trash;
+            if (!Physics.SphereCast(transform.position, m_CharacterController.radius, Vector3.down, out trash,
+							   m_CharacterController.height / 2f + .1f, Physics.AllLayers, QueryTriggerInteraction.Ignore) && !m_Jumping)
             {
                 m_MoveDir.y = 0f;
+				m_JumpCounter = 2;
+				m_Jumping = true;
             }
 
             if (m_CharacterController.isGrounded)
@@ -148,7 +161,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             m_PreviouslyGrounded = m_CharacterController.isGrounded;
 
-            if (CrossPlatformInputManager.GetButtonDown("Slide"))
+            if (CrossPlatformInputManager.GetButtonDown("Slide") && !m_IsWallrunning)
             {
                 if(m_CharacterController.isGrounded)
                 {
@@ -168,7 +181,196 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
         }
 
-        private IEnumerator Spike()
+		private void FixedUpdate()
+		{
+			m_LastFrameVel = (transform.position - m_LastFramePos)/Time.fixedDeltaTime;
+			m_LastFramePos = transform.position;
+			float metersPerSecond = new Vector3(m_LastFrameVel.x, 0f, m_LastFrameVel.z).magnitude;
+			m_SpeedText.text = "Speed: " + Mathf.RoundToInt(metersPerSecond);
+
+			float speed;
+			GetInput(out speed);
+
+			speed += m_SlideSpeedBonus + m_WallrunSpeedBonus;
+
+			// always move along the camera forward as it is the direction that it being aimed at
+			Vector3 desiredMove = transform.forward * m_Input.y + transform.right * m_Input.x;
+
+			// get a normal for the surface that is being touched to move along it
+			RaycastHit hitInfo;
+			Physics.SphereCast(transform.position, m_CharacterController.radius, Vector3.down, out hitInfo,
+							   m_CharacterController.height / 2f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+			desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
+			desiredMove.x *= speed;
+			desiredMove.z *= speed;
+
+
+			if (m_CharacterController.isGrounded)
+			{
+				if (!m_IsSlideLocked)
+				{
+					m_MoveDir.x = desiredMove.x;
+					m_MoveDir.z = desiredMove.z;
+				}
+				else
+				{
+					m_MoveDir = transform.InverseTransformDirection(m_MoveDir);
+					m_MoveDir.x = transform.InverseTransformDirection(desiredMove).x / 3.0f;
+					m_MoveDir = transform.TransformDirection(m_MoveDir);
+				}
+			}
+			else
+			{
+				Vector3 rawMove = new Vector3();
+				rawMove.x = m_MoveDir.x + m_AirAccel * (desiredMove.x - m_MoveDir.x);
+				rawMove.z = m_MoveDir.z + m_AirAccel * (desiredMove.z - m_MoveDir.z);
+				if (desiredMove.x > m_MoveDir.x)
+				{
+					m_MoveDir.x = Mathf.Min(rawMove.x, desiredMove.x);
+				}
+				else
+				{
+					m_MoveDir.x = Mathf.Max(rawMove.x, desiredMove.x);
+				}
+
+				if (desiredMove.z > m_MoveDir.z)
+				{
+					m_MoveDir.z = Mathf.Min(rawMove.z, desiredMove.z);
+				}
+				else
+				{
+					m_MoveDir.z = Mathf.Max(rawMove.z, desiredMove.z);
+				}
+			}
+
+			if (m_CharacterController.isGrounded)
+			{
+				m_MoveDir.y = -m_StickToGroundForce;
+			}
+			else if (m_Spiking)
+			{
+				m_MoveDir.y = -m_MeteorVel;
+			}
+			else if (m_IsWallrunning)
+			{
+				m_MoveDir += Physics.gravity * m_GravityMultiplier * Time.fixedDeltaTime * m_WallrunGravityReduction + Vector3.up*m_WallrunVerticalKick;
+				if (m_MoveDir.y < 0f)
+				{
+					m_MoveDir.y += m_WallrunVerticalKick;
+				}
+
+				
+				desiredMove = Vector3.ProjectOnPlane(desiredMove, m_WallrunNormal);
+				desiredMove.y = 0f;
+				desiredMove.Normalize();
+				desiredMove *= speed;
+				Vector3 pushDir = desiredMove;
+
+				Vector3 reverseNormalMagnet = -m_WallrunNormal.normalized * m_StickToGroundForce;
+				
+				RaycastHit trash;
+				if (!Physics.SphereCast(transform.position, m_CharacterController.radius, -m_WallrunNormal, out trash,
+							   m_CharacterController.height / 2f + 1f, Physics.AllLayers, QueryTriggerInteraction.Ignore))
+				{
+					m_MoveDir.x = reverseNormalMagnet.x;
+					m_MoveDir.z = reverseNormalMagnet.z;
+					m_MoveDir.x += m_WallrunDirectionAlongWall.x * speed + pushDir.x / 4f;
+					m_MoveDir.z += m_WallrunDirectionAlongWall.z * speed + pushDir.z / 4f;
+				}
+
+				
+
+			}
+			else
+			{
+				m_MoveDir += Physics.gravity * m_GravityMultiplier * Time.fixedDeltaTime;
+			}
+
+			if (m_Jump)
+			{
+				m_Jump = false;
+				m_lastJumpTime = Time.time;
+				if (m_Jumping)
+				{
+					switch (m_JumpCounter)
+					{
+						case 2:
+							m_MoveDir.y = m_JumpSpeed;
+							m_MoveDir.x = desiredMove.x;
+							m_MoveDir.z = desiredMove.z;
+							m_JumpCounter++;
+							PlayJumpSound();
+							break;
+						case 3:
+							m_MoveDir.y = m_JumpSpeed / 3.0f;
+							m_MoveDir.x = desiredMove.x;
+							m_MoveDir.z = desiredMove.z;
+							m_JumpCounter++;
+							PlayJumpSound();
+							break;
+					}
+				}
+				else
+				{
+					m_MoveDir.y = m_JumpSpeed;
+					if (m_IsWallrunning)
+					{
+						m_MoveDir.x = m_WallrunNormal.x * m_WallrunKickoffForce;
+						m_MoveDir.z = m_WallrunNormal.z * m_WallrunKickoffForce;
+						m_MoveDir.y += m_JumpSpeed / 4f;
+					}
+					m_JumpCounter++;
+					PlayJumpSound();
+					m_Jumping = true;
+				}
+			}
+
+			m_CollisionFlags = m_CharacterController.Move(m_MoveDir * Time.fixedDeltaTime);
+
+			ProgressStepCycle(speed);
+			UpdateCameraPosition(speed);
+
+			m_MouseLook.UpdateCursorLock();
+		}
+
+
+		private void OnControllerColliderHit(ControllerColliderHit hit)
+		{
+			if (m_CollisionFlags == CollisionFlags.Sides)
+			{
+				GameObject wall = hit.gameObject;
+
+				if (m_IsWallrunning && hit.collider.gameObject != m_currentWallObj)
+				{
+					//Debug.Log("old: " + m_currentWallObj + "new: " + hit.collider.gameObject);
+					m_NeedToCheckNewWallNormal = true;
+					m_NewWallNormalToCheck = hit.normal;
+					m_NewWallObjToCheck = hit.collider.gameObject;
+				}
+
+				if (CanStartWallrun(hit) && !m_IsWallrunning)
+				{
+					StartCoroutine(Wallrun(hit.normal, hit.collider.gameObject));
+				}
+
+			}
+
+			Rigidbody body = hit.collider.attachedRigidbody;
+			//dont move the rigidbody if the character is on top of it
+			if (m_CollisionFlags == CollisionFlags.Below)
+			{
+				return;
+			}
+
+			if (body == null || body.isKinematic)
+			{
+				return;
+			}
+
+			body.AddForceAtPosition(m_CharacterController.velocity * 0.1f, hit.point, ForceMode.Impulse);
+		}
+
+		private IEnumerator Spike()
         {
             m_Spiking = true;
             m_IsSlideLocked = true;
@@ -193,7 +395,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             transform.localScale = new Vector3(1.0f, 0.5f, 1.0f);
             
-            for (float t = 0; t <= 1; t += Time.fixedDeltaTime / m_SlideDuration)
+            for (float t = 0; t <= 1; t += Time.deltaTime / m_SlideDuration)
             {
                 m_SlideSpeedBonus = m_SlideSpeedBonusCurve.Evaluate(t) * m_MaxSlideSpeedBonusAmt;
 
@@ -219,7 +421,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_MidStandUp = true;
             Vector3 standDeltaVec = new Vector3(1.0f, 0.5f, 1.0f);
 
-            for (float t = 0; t <= 1; t += Time.fixedDeltaTime / m_StandUpDuration)
+            for (float t = 0; t <= 1; t += Time.deltaTime / m_StandUpDuration)
             {
                 standDeltaVec.y = Mathf.Lerp(0.5f, 1.0f, t);
                 transform.localScale = standDeltaVec;
@@ -240,134 +442,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_AudioSource.clip = m_LandSound;
             m_AudioSource.Play();
             m_NextStep = m_StepCycle + .5f;
-        }
-
-
-        private void FixedUpdate()
-        {
-            float speed;
-            GetInput(out speed);
-
-            speed += m_SlideSpeedBonus;
-
-            // always move along the camera forward as it is the direction that it being aimed at
-            Vector3 desiredMove = transform.forward*m_Input.y + transform.right*m_Input.x;
-
-            // get a normal for the surface that is being touched to move along it
-            RaycastHit hitInfo;
-            Physics.SphereCast(transform.position, m_CharacterController.radius, Vector3.down, out hitInfo,
-                               m_CharacterController.height/2f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-            desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
-            desiredMove.x *= speed;
-            desiredMove.z *= speed;
-
-
-            if (m_CharacterController.isGrounded)
-            {
-                if (!m_IsSlideLocked)
-                {
-                    m_MoveDir.x = desiredMove.x;
-                    m_MoveDir.z = desiredMove.z;
-                }
-                else
-                {
-                    m_MoveDir = transform.InverseTransformDirection(m_MoveDir);
-                    m_MoveDir.x = transform.InverseTransformDirection(desiredMove).x / 3.0f;
-                    m_MoveDir = transform.TransformDirection(m_MoveDir);
-                }
-            }
-            else
-            {
-                Vector3 rawMove = new Vector3();
-                rawMove.x = m_MoveDir.x + m_AirAccel * (desiredMove.x - m_MoveDir.x);
-                rawMove.z = m_MoveDir.z + m_AirAccel * (desiredMove.z - m_MoveDir.z);
-                if (desiredMove.x > m_MoveDir.x)
-                {
-                    m_MoveDir.x = Mathf.Min(rawMove.x, desiredMove.x);
-                }
-                else
-                {
-                    m_MoveDir.x = Mathf.Max(rawMove.x, desiredMove.x);
-                }
-
-                if (desiredMove.z > m_MoveDir.z)
-                {
-                    m_MoveDir.z = Mathf.Min(rawMove.z, desiredMove.z);
-                }
-                else
-                {
-                    m_MoveDir.z = Mathf.Max(rawMove.z, desiredMove.z);
-                }
-            }
-
-            if (m_CharacterController.isGrounded)
-            {
-                m_MoveDir.y = -m_StickToGroundForce;
-            }
-            else if (m_Spiking)
-            {
-                m_MoveDir.y = -m_MeteorVel;
-            }
-            else if (m_IsWallrunning)
-            {
-                m_MoveDir += Physics.gravity * m_GravityMultiplier * Time.fixedDeltaTime * m_WallrunGravityReduction;
-
-                Vector3 reverseNormalMagnet = -m_WallrunNormal.normalized * m_StickToGroundForce;
-                m_MoveDir.x = reverseNormalMagnet.x;
-                m_MoveDir.z = reverseNormalMagnet.z;
-
-                m_MoveDir.y = 0f;
-
-                m_MoveDir += m_WallrunDirectionAlongWall * m_WallrunSpeedBonus;
-            }
-            else
-            {
-                m_MoveDir += Physics.gravity*m_GravityMultiplier*Time.fixedDeltaTime;
-            }
-
-            if (m_Jump)
-            {
-                m_Jump = false;
-                m_lastJumpTime = Time.time;
-                if (m_Jumping)
-                {
-                    switch (m_JumpCounter)
-                    {
-                        case 2:
-                            m_MoveDir.y = m_JumpSpeed;
-                            m_MoveDir.x = desiredMove.x;
-                            m_MoveDir.z = desiredMove.z;
-                            m_JumpCounter++;
-                            PlayJumpSound();
-                            break;
-                        case 3:
-                            m_MoveDir.y = m_JumpSpeed / 3.0f;
-                            m_MoveDir.x = desiredMove.x;
-                            m_MoveDir.z = desiredMove.z;
-                            m_JumpCounter++;
-                            PlayJumpSound();
-                            break;
-                    }
-                }
-                else
-                {
-                    if (m_IsWallrunning)
-                    {
-                        m_MoveDir = m_WallrunNormal * m_WallrunKickoffForce;
-                    }
-                    m_MoveDir.y = m_JumpSpeed;
-                    m_JumpCounter++;
-                    PlayJumpSound();
-                    m_Jumping = true;
-                }
-            }
-
-            m_CollisionFlags = m_CharacterController.Move(m_MoveDir*Time.fixedDeltaTime);
-
-            ProgressStepCycle(speed);
-            UpdateCameraPosition(speed);
-
-            m_MouseLook.UpdateCursorLock();
         }
 
 
@@ -452,7 +526,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_IsWalking = !Input.GetKey(KeyCode.LeftShift);
 #endif
             // set the desired speed to be walking or running
-            speed = m_IsWalking ? m_WalkSpeed : m_RunSpeed;
+            speed = m_WalkSpeed;
             m_Input = new Vector2(horizontal, vertical);
 
             // normalize input if it exceeds 1 in combined length:
@@ -477,40 +551,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
         }
 
 
-        private void OnControllerColliderHit(ControllerColliderHit hit)
-        {
-            if (m_CollisionFlags == CollisionFlags.Sides)
-            {
-                GameObject wall = hit.gameObject;
-
-                if(CanStartWallrun(hit))
-                {
-                    StartCoroutine(Wallrun(hit));
-                }
-
-                if (m_IsWallrunning && hit.collider.gameObject != m_currentWallObj)
-                {
-                    m_NeedToCheckNewWallNormal = true;
-                    m_NewWallHitToCheck = hit;
-                    Debug.Log("Hit wall: " + hit.collider.gameObject);
-                }
-            }
-
-            Rigidbody body = hit.collider.attachedRigidbody;
-            //dont move the rigidbody if the character is on top of it
-            if (m_CollisionFlags == CollisionFlags.Below)
-            {
-                return;
-            }
-
-            if (body == null || body.isKinematic)
-            {
-                return;
-            }
-
-            body.AddForceAtPosition(m_CharacterController.velocity*0.1f, hit.point, ForceMode.Impulse);
-        }
-
         private bool CanStartWallrun(ControllerColliderHit hit)
         {
             if (m_CharacterController.isGrounded)
@@ -534,73 +574,105 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
 
             Vector3 wallNormal = hit.normal;
-            Vector3 componentAlongWall = Vector3.ProjectOnPlane(m_MoveDir, wallNormal);
+            Vector3 componentAlongWall = Vector3.ProjectOnPlane(m_LastFrameVel, wallNormal);
             Vector3 parallelToFloor = new Vector3(componentAlongWall.x, 0f, componentAlongWall.z);
-
             if (Vector3.Magnitude(parallelToFloor) < m_MinHorizontalWallrunThreshold)
             {
                 return false;
             }
 
+			Debug.Log(Vector3.Dot(m_MoveDir.normalized, -wallNormal));
+			if (Vector3.Dot(m_MoveDir.normalized, -wallNormal) > m_WallDotThreshold)
+			{
+				return false;
+			}
+
             return true;
         }
 
-        private IEnumerator Wallrun(ControllerColliderHit hit)
+        private IEnumerator Wallrun(Vector3 normal, GameObject obj)
         {
+			//Debug.Log("starting wall run");
+			bool brokeEarly = false;
             m_IsWallrunning = true;
-            m_WallrunNormal = hit.normal;
+            m_WallrunNormal = normal;
             m_JumpCounter = 1;
             m_Jumping = false;
-            m_currentWallObj = hit.collider.gameObject;
+            m_currentWallObj = obj;
             Vector3 componentAlongWall = Vector3.ProjectOnPlane(m_MoveDir, m_WallrunNormal);
             m_WallrunDirectionAlongWall = new Vector3(componentAlongWall.x, 0f, componentAlongWall.z);
             m_WallrunDirectionAlongWall.Normalize();
 
             m_WallrunSpeedBonus = 0f;
+			m_WallrunVerticalKick = m_WallrunVerticalKickAddition;
 
-            for (float t = 0; t < m_WallrunDuration; t += Time.fixedDeltaTime)
+			for (float t = 0; t < m_WallrunDuration; t += Time.deltaTime)
             {
-                m_WallrunSpeedBonus = Mathf.Lerp(m_WallrunSpeedBonus, m_MaxWallrunSpeedBonus, .7f);
+				//Debug.Log("wall running");
 
+				m_WallrunSpeedBonus = Mathf.Lerp(m_WallrunSpeedBonus, m_MaxWallrunSpeedBonus, 20f*Time.deltaTime);
+				m_WallrunVerticalKick = Mathf.Lerp(m_WallrunVerticalKickAddition, 0f, t * 3f);
+
+				
                 if (m_NeedToCheckNewWallNormal)
                 {
                     m_NeedToCheckNewWallNormal = false;
 
-                    Debug.Log(Vector3.Dot(m_WallrunNormal, m_NewWallHitToCheck.normal));
-                    if (Vector3.Dot(m_WallrunNormal, m_NewWallHitToCheck.normal) < m_WallDotThreshold)
+                    if (Vector3.Dot(m_WallrunNormal.normalized, m_NewWallNormalToCheck.normalized) < m_WallDotThreshold)
                     {
                         m_Jumping = true;
-                        break;
+						m_JumpCounter = 2;
+						brokeEarly = true;
+						break;
                     }
                     else
                     {
-                        m_WallrunNormal = m_NewWallHitToCheck.normal;
+                        m_WallrunNormal = m_NewWallNormalToCheck;
                         componentAlongWall = Vector3.ProjectOnPlane(m_MoveDir, m_WallrunNormal);
                         m_WallrunDirectionAlongWall = new Vector3(componentAlongWall.x, 0f, componentAlongWall.z);
                         m_WallrunDirectionAlongWall.Normalize();
-                        m_currentWallObj = m_NewWallHitToCheck.collider.gameObject;
+                        m_currentWallObj = m_NewWallObjToCheck;
                     }
                 }
 
                 if (m_CharacterController.isGrounded)
                 {
-                    break;
+					brokeEarly = true;
+					break;
                 }
 
                 if (m_Jumping)
                 {
-                    break;
+					brokeEarly = true;
+					break;
                 }
 
-                if (m_CollisionFlags == CollisionFlags.None)
+				RaycastHit trash;
+                if (!Physics.SphereCast(transform.position, m_CharacterController.radius, -m_WallrunNormal, out trash,
+							   m_CharacterController.height / 2f + 1f, Physics.AllLayers, QueryTriggerInteraction.Ignore))
                 {
-                    break;
+					m_Jumping = true;
+					m_JumpCounter = 2;
+					brokeEarly = true;
+					break;
                 }
+
+				if (m_CollisionFlags == CollisionFlags.Below)
+				{
+					brokeEarly = true;
+					break;
+				}
                 yield return null;
             }
-
+			Debug.Log("Done wall running");
+			if (!brokeEarly)
+			{
+				m_JumpCounter = 2;
+				m_Jumping = true;
+			}
             m_WallrunSpeedBonus = 0f;
-            m_IsWallrunning = false;
+			m_WallrunVerticalKick = 0f;
+			m_IsWallrunning = false;
         }
     }
 }

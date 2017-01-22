@@ -104,8 +104,8 @@ Shader "Shader Forge/DissolveableStandard" {
                 float3 normalLocal = _BumpMap_var.rgb;
                 float3 normalDirection = normalize(mul( normalLocal, tangentTransform )); // Perturbed normals
                 float3 viewReflectDirection = reflect( -viewDirection, normalDirection );
-                float4 node_2962 = _Time + _TimeEditor;
-                float2 node_2047 = (i.uv0+node_2962.g*float2(0.025,0));
+                float4 node_8853 = _Time + _TimeEditor;
+                float2 node_2047 = (i.uv0+node_8853.g*float2(0.025,0));
                 float4 _Noise_var = tex2D(_Noise,TRANSFORM_TEX(node_2047, _Noise));
                 clip((((1.0 - _FadeAmount)*2.0+-1.0)+_Noise_var.r) - 0.5);
                 float3 lightDirection = normalize(_WorldSpaceLightPos0.xyz);
@@ -277,8 +277,8 @@ Shader "Shader Forge/DissolveableStandard" {
                 float4 _BumpMap_var = tex2D(_BumpMap,TRANSFORM_TEX(i.uv0, _BumpMap));
                 float3 normalLocal = _BumpMap_var.rgb;
                 float3 normalDirection = normalize(mul( normalLocal, tangentTransform )); // Perturbed normals
-                float4 node_5646 = _Time + _TimeEditor;
-                float2 node_2047 = (i.uv0+node_5646.g*float2(0.025,0));
+                float4 node_6362 = _Time + _TimeEditor;
+                float2 node_2047 = (i.uv0+node_6362.g*float2(0.025,0));
                 float4 _Noise_var = tex2D(_Noise,TRANSFORM_TEX(node_2047, _Noise));
                 clip((((1.0 - _FadeAmount)*2.0+-1.0)+_Noise_var.r) - 0.5);
                 float3 lightDirection = normalize(lerp(_WorldSpaceLightPos0.xyz, _WorldSpaceLightPos0.xyz - i.posWorld.xyz,_WorldSpaceLightPos0.w));
@@ -382,8 +382,8 @@ Shader "Shader Forge/DissolveableStandard" {
             }
             float4 frag(VertexOutput i) : COLOR {
                 float3 viewDirection = normalize(_WorldSpaceCameraPos.xyz - i.posWorld.xyz);
-                float4 node_5316 = _Time + _TimeEditor;
-                float2 node_2047 = (i.uv0+node_5316.g*float2(0.025,0));
+                float4 node_7934 = _Time + _TimeEditor;
+                float2 node_2047 = (i.uv0+node_7934.g*float2(0.025,0));
                 float4 _Noise_var = tex2D(_Noise,TRANSFORM_TEX(node_2047, _Noise));
                 clip((((1.0 - _FadeAmount)*2.0+-1.0)+_Noise_var.r) - 0.5);
                 SHADOW_CASTER_FRAGMENT(i)

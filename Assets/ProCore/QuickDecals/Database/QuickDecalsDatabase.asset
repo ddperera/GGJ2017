@@ -1,0 +1,307 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bfeb40e027395d45a5545d3b06bcea6, type: 3}
+  m_Name: QuickDecalsDatabase
+  m_EditorClassIdentifier: 
+  decalGroups:
+  - decals:
+    - name: JumpHint
+      id: 948f0f31ec795de41be43a01e683a686
+      isPacked: 1
+      materialId: 
+      rotation: {x: -45, y: 45, z: 0}
+      scale: {x: 0.8, y: 1.2, z: 3}
+      atlasRect:
+        serializedVersion: 2
+        x: 0.2507324
+        y: 0.2507324
+        width: 0.25
+        height: 0.25
+      orgGroup: 0
+      orgIndex: 0
+      atlasGroup: 0
+      atlasIndex: 5
+      rotationPlacement: 0
+      scalePlacement: 0
+      texture: {fileID: 2800000, guid: 948f0f31ec795de41be43a01e683a686, type: 3}
+    - name: WallRunHint
+      id: 222acb65960f2a8439b2c61d89b1b3f5
+      isPacked: 1
+      materialId: 
+      rotation: {x: -45, y: 45, z: 0}
+      scale: {x: 0.8, y: 1.2, z: 3}
+      atlasRect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0.25
+        height: 0.25
+      orgGroup: 0
+      orgIndex: 1
+      atlasGroup: 0
+      atlasIndex: 0
+      rotationPlacement: 0
+      scalePlacement: 0
+      texture: {fileID: 2800000, guid: 222acb65960f2a8439b2c61d89b1b3f5, type: 3}
+    - name: MeteorHint
+      id: 09a4b9aa94aa288479dd2554ef0680e4
+      isPacked: 1
+      materialId: 
+      rotation: {x: -45, y: 45, z: 0}
+      scale: {x: 0.8, y: 1.2, z: 3}
+      atlasRect:
+        serializedVersion: 2
+        x: 0.2507324
+        y: 0
+        width: 0.25
+        height: 0.25
+      orgGroup: 0
+      orgIndex: 2
+      atlasGroup: 0
+      atlasIndex: 1
+      rotationPlacement: 0
+      scalePlacement: 0
+      texture: {fileID: 2800000, guid: 09a4b9aa94aa288479dd2554ef0680e4, type: 3}
+    - name: TripleJumpHint
+      id: 55a6b6cfd17f59541bc0b879f3773359
+      isPacked: 1
+      materialId: 
+      rotation: {x: -45, y: 45, z: 0}
+      scale: {x: 0.8, y: 1.2, z: 3}
+      atlasRect:
+        serializedVersion: 2
+        x: 0.5014648
+        y: 0
+        width: 0.25
+        height: 0.25
+      orgGroup: 0
+      orgIndex: 3
+      atlasGroup: 0
+      atlasIndex: 2
+      rotationPlacement: 0
+      scalePlacement: 0
+      texture: {fileID: 2800000, guid: 55a6b6cfd17f59541bc0b879f3773359, type: 3}
+    - name: SlideHint
+      id: 4547df8ac700ed3428846c8aa5242c0c
+      isPacked: 1
+      materialId: 
+      rotation: {x: -45, y: 45, z: 0}
+      scale: {x: 0.8, y: 1.2, z: 3}
+      atlasRect:
+        serializedVersion: 2
+        x: 0
+        y: 0.2507324
+        width: 0.25
+        height: 0.25
+      orgGroup: 0
+      orgIndex: 4
+      atlasGroup: 0
+      atlasIndex: 3
+      rotationPlacement: 0
+      scalePlacement: 0
+      texture: {fileID: 2800000, guid: 4547df8ac700ed3428846c8aa5242c0c, type: 3}
+    - name: WallJumpHint
+      id: 27e76b61dd349d842b92c69014bf26bf
+      isPacked: 1
+      materialId: 
+      rotation: {x: -45, y: 45, z: 0}
+      scale: {x: 0.8, y: 1.2, z: 3}
+      atlasRect:
+        serializedVersion: 2
+        x: 0
+        y: 0.5014648
+        width: 0.25
+        height: 0.25
+      orgGroup: 0
+      orgIndex: 5
+      atlasGroup: 0
+      atlasIndex: 4
+      rotationPlacement: 0
+      scalePlacement: 0
+      texture: {fileID: 2800000, guid: 27e76b61dd349d842b92c69014bf26bf, type: 3}
+    name: 
+    shader: {fileID: 0}
+    isPacked: 0
+    material: {fileID: 0}
+    maxAtlasSize: 0
+    padding: 0
+  s_decals:
+  - '{
+
+    JumpHint
+
+    948f0f31ec795de41be43a01e683a686
+
+    (-45.0, 45.0, 0.0)
+
+    (0.8, 1.2, 3.0)
+
+    (0.2507324, 0.2507324, 0.25, 0.25)
+
+    0
+
+    0
+
+    0
+
+    5
+
+    0
+
+    0
+
+    True
+
+    }'
+  - '{
+
+    WallRunHint
+
+    222acb65960f2a8439b2c61d89b1b3f5
+
+    (-45.0, 45.0, 0.0)
+
+    (0.8, 1.2, 3.0)
+
+    (0, 0, 0.25, 0.25)
+
+    0
+
+    0
+
+    1
+
+    0
+
+    0
+
+    0
+
+    True
+
+    }'
+  - '{
+
+    MeteorHint
+
+    09a4b9aa94aa288479dd2554ef0680e4
+
+    (-45.0, 45.0, 0.0)
+
+    (0.8, 1.2, 3.0)
+
+    (0.2507324, 0, 0.25, 0.25)
+
+    0
+
+    0
+
+    2
+
+    1
+
+    0
+
+    0
+
+    True
+
+    }'
+  - '{
+
+    TripleJumpHint
+
+    55a6b6cfd17f59541bc0b879f3773359
+
+    (-45.0, 45.0, 0.0)
+
+    (0.8, 1.2, 3.0)
+
+    (0.5014648, 0, 0.25, 0.25)
+
+    0
+
+    0
+
+    3
+
+    2
+
+    0
+
+    0
+
+    True
+
+    }'
+  - '{
+
+    SlideHint
+
+    4547df8ac700ed3428846c8aa5242c0c
+
+    (-45.0, 45.0, 0.0)
+
+    (0.8, 1.2, 3.0)
+
+    (0, 0.2507324, 0.25, 0.25)
+
+    0
+
+    0
+
+    4
+
+    3
+
+    0
+
+    0
+
+    True
+
+    }'
+  - '{
+
+    WallJumpHint
+
+    27e76b61dd349d842b92c69014bf26bf
+
+    (-45.0, 45.0, 0.0)
+
+    (0.8, 1.2, 3.0)
+
+    (0, 0.5014648, 0.25, 0.25)
+
+    0
+
+    0
+
+    5
+
+    4
+
+    0
+
+    0
+
+    True
+
+    }'
+  names:
+  - WallRunHint
+  isPacked: 01
+  materials:
+  - 67e02a680ccb92348af8179b7a73d21a
+  shaders:
+  - Legacy Shaders/Transparent/Diffuse
+  atlasSize: 00040000
+  padding: 03000000

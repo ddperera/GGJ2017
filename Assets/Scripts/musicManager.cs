@@ -26,6 +26,7 @@ public class musicManager : MonoBehaviour {
 		music = musicObject.GetComponent<AudioSource> ();
 		tick = tickObject.GetComponent<AudioSource> ();
 		boom = boomObject.GetComponent<AudioSource> ();
+		music.volume = 0f;
 	}
 	IEnumerator playMusic(){
 		startMusic = false;

@@ -29,6 +29,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private AudioClip[] m_FootstepSounds;    // an array of footstep sounds that will be randomly selected from.
         [SerializeField] private AudioClip m_JumpSound;           // the sound played when character leaves the ground.
         [SerializeField] private AudioClip m_LandSound;           // the sound played when character touches back on ground.
+        [SerializeField] private AudioClip m_SlideSound;
         [SerializeField] private float m_AirAccel;
         [SerializeField] private AnimationCurve m_SlideSpeedBonusCurve;
         [SerializeField] private float m_SlideDuration;
@@ -138,7 +139,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 }
             }
 
-            if (!m_PreviouslyGrounded && m_CharacterController.isGrounded)
+            if (!m_PreviouslyGrounded && m_CharacterController.isGrounded && !m_Sliding)
             {
                 StartCoroutine(m_JumpBob.DoBobCycle());
                 PlayLandingSound();
@@ -403,6 +404,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_CanInterruptSlide = false;
             bool standUpHasRun = false;
 
+            m_AudioSource.PlayOneShot(m_SlideSound);
+
             transform.localScale = new Vector3(1.0f, 0.5f, 1.0f);
             
             for (float t = 0; t <= 1; t += Time.deltaTime / m_SlideDuration)
@@ -485,7 +488,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             if (!m_CharacterController.isGrounded)
             {
-                return;
+                if (!m_IsWallrunning)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                if(m_Sliding)
+                {
+                    return;
+                }
             }
             // pick & play a random footstep sound from the array,
             // excluding sound at index 0

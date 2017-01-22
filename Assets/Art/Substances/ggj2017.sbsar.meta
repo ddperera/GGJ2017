@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: b74f709a0a7982e4fbd027d5e8f69c24
-timeCreated: 1485035766
+timeCreated: 1485077482
 licenseType: Free
 SubstanceImporter:
   serializedVersion: 5
@@ -48,6 +48,20 @@ SubstanceImporter:
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
+        texture: {instanceID: 0}
+    - name: GoldColor
+      value:
+        scalar[0]: 1
+        scalar[1]: 0.633341
+        scalar[2]: 0.333333
+        scalar[3]: 1
+        texture: {instanceID: 0}
+    - name: DirtColor
+      value:
+        scalar[0]: 1
+        scalar[1]: 0.723339
+        scalar[2]: 0.501961
+        scalar[3]: 1
         texture: {instanceID: 0}
     materialInformation:
       serializedVersion: 5
@@ -228,9 +242,9 @@ SubstanceImporter:
     prototypeName: Plaster
     shaderName: 
     shader: {fileID: 45, guid: 0000000000000000f000000000000000, type: 0}
-    shaderKeywords: 
+    shaderKeywords: _EMISSION _NORMALMAP _PARALLAXMAP _SPECGLOSSMAP
     renderQueue: -1
-    lightmapFlags: 5
+    lightmapFlags: 1
     inputs:
     - name: $outputsize
       value:
@@ -572,7 +586,7 @@ SubstanceImporter:
         second: 1
       - first:
           name: _Parallax
-        second: 0.01
+        second: 0.02
       - first:
           name: _SmoothnessTextureChannel
         second: 0

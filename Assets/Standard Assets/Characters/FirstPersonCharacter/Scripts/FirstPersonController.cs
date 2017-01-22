@@ -145,9 +145,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 m_MoveDir.y = 0f;
                 m_Jumping = false;
             }
-            if (!m_CharacterController.isGrounded && !m_Jumping && m_PreviouslyGrounded)
+			RaycastHit trash;
+            if (!Physics.SphereCast(transform.position, m_CharacterController.radius, Vector3.down, out trash,
+							   m_CharacterController.height / 2f + .1f, Physics.AllLayers, QueryTriggerInteraction.Ignore) && !m_Jumping)
             {
                 m_MoveDir.y = 0f;
+				m_JumpCounter = 2;
+				m_Jumping = true;
             }
 
             if (m_CharacterController.isGrounded)
@@ -250,6 +254,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
 			else if (m_IsWallrunning)
 			{
 				m_MoveDir += Physics.gravity * m_GravityMultiplier * Time.fixedDeltaTime * m_WallrunGravityReduction + Vector3.up*m_WallrunVerticalKick;
+				if (m_MoveDir.y < 0f)
+				{
+					m_MoveDir.y += m_WallrunVerticalKick;
+				}
 
 				
 				desiredMove = Vector3.ProjectOnPlane(desiredMove, m_WallrunNormal);
@@ -603,7 +611,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 				//Debug.Log("wall running");
 
 				m_WallrunSpeedBonus = Mathf.Lerp(m_WallrunSpeedBonus, m_MaxWallrunSpeedBonus, 20f*Time.deltaTime);
-				m_WallrunVerticalKick = Mathf.Lerp(m_WallrunVerticalKickAddition, 0f, t * 5f);
+				m_WallrunVerticalKick = Mathf.Lerp(m_WallrunVerticalKickAddition, 0f, t * 3f);
 
 				
                 if (m_NeedToCheckNewWallNormal)

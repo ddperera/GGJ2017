@@ -252,11 +252,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
 			}
 			else if (m_IsWallrunning)
 			{
-				m_MoveDir += Physics.gravity * m_GravityMultiplier * Time.fixedDeltaTime * m_WallrunGravityReduction + Vector3.up*m_WallrunVerticalKick;
-				if (m_MoveDir.y < -.5f - m_WallrunVerticalKick)
+				m_MoveDir += Physics.gravity * m_GravityMultiplier * Time.fixedDeltaTime * m_WallrunGravityReduction/* + Vector3.up*m_WallrunVerticalKick*/;
+				/*if (m_MoveDir.y < -.5f - m_WallrunVerticalKick)
 				{
 					m_MoveDir.y += m_WallrunVerticalKick;
-				}
+				}*/
 
 				
 				desiredMove = Vector3.ProjectOnPlane(desiredMove, m_WallrunNormal);
@@ -314,8 +314,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 					m_MoveDir.y = m_JumpSpeed;
 					if (m_IsWallrunning)
 					{
-						m_MoveDir.x = m_WallrunNormal.x * m_WallrunKickoffForce + m_WallrunDirectionAlongWall.x/2f;
-						m_MoveDir.z = m_WallrunNormal.z * m_WallrunKickoffForce + m_WallrunDirectionAlongWall.z/2f;
+						m_MoveDir.x = m_WallrunNormal.x * m_WallrunKickoffForce /*+ m_WallrunDirectionAlongWall.x/2f*/;
+						m_MoveDir.z = m_WallrunNormal.z * m_WallrunKickoffForce /*+ m_WallrunDirectionAlongWall.z/2f*/;
 						m_MoveDir.y = 2f * m_JumpSpeed / 3f;
 					}
 					m_JumpCounter++;
@@ -552,7 +552,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private bool CanStartWallrun(ControllerColliderHit hit)
         {
-			if (Time.time - m_LastWalljumpEnd < 1f)
+			if (Time.time - m_LastWalljumpEnd < .75f)
 			{
 				return false;
 			}

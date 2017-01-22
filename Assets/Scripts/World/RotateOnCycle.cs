@@ -10,7 +10,7 @@ public class RotateOnCycle : TimeCycleListener {
 
 	void Start () {
 		m_canCycle = true;
-		m_curCycleCount = 0;
+		m_curCycleCount = cycleActionStartOffset;
 	}
 
 	public override void OnCycle()

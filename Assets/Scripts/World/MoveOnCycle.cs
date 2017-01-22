@@ -11,7 +11,7 @@ public class MoveOnCycle : TimeCycleListener {
 	void Start()
 	{
 		m_canCycle = true;
-		m_curCycleCount = 0;
+		m_curCycleCount = cycleActionStartOffset;
 
 		m_initialPosition = transform.position;
 		m_endPosition = m_initialPosition + movementAmount;

@@ -31,11 +31,20 @@ public class TimeCycleManager : MonoBehaviour {
 
 		foreach (TimeCycleListener listener in m_listeners)
 		{
-			if (Time.time >= m_lastCycleTime + secondsPerCycle - listener.cycleActionTime + .05f)
+			if (Time.time >= m_lastCycleTime + secondsPerCycle - listener.cycleActionTime)
 			{
+				if (listener.cycledRecently) continue;
 				listener.OnCycle();
+				StartCoroutine(BlockListener(listener));
 				//Debug.Log(listener + " cycling");
 			}
 		}
+	}
+
+	private IEnumerator BlockListener(TimeCycleListener l)
+	{
+		l.cycledRecently = true;
+		yield return new WaitForSeconds(l.cycleActionTime + 0.05f);
+		l.cycledRecently = false;
 	}
 }

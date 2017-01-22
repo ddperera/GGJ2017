@@ -293,6 +293,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
 				{
 					switch (m_JumpCounter)
 					{
+						case 1:
+							m_MoveDir.y = m_JumpSpeed;
+							if (m_IsWallrunning)
+							{
+								m_MoveDir.x = m_WallrunNormal.x * m_WallrunKickoffForce /*+ m_WallrunDirectionAlongWall.x/2f*/;
+								m_MoveDir.z = m_WallrunNormal.z * m_WallrunKickoffForce /*+ m_WallrunDirectionAlongWall.z/2f*/;
+								m_MoveDir.y = 2f * m_JumpSpeed / 3f;
+							}
+							m_JumpCounter++;
+							PlayJumpSound();
+							break;
 						case 2:
 							m_MoveDir.y = m_JumpSpeed;
 							m_MoveDir.x = desiredMove.x;
@@ -596,7 +607,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private IEnumerator Wallrun(Vector3 normal, GameObject obj)
         {
-			//Debug.Log("starting wall run");
+			Debug.Log("starting wall run");
 			bool brokeEarly = false;
             m_IsWallrunning = true;
             m_WallrunNormal = normal;
@@ -612,7 +623,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
 			for (float t = 0; t < m_WallrunDuration; t += Time.deltaTime)
             {
-				//Debug.Log("wall running");
+				Debug.Log("wall running");
 
 				m_WallrunSpeedBonus = Mathf.Lerp(m_WallrunSpeedBonus, m_MaxWallrunSpeedBonus, 20f*Time.deltaTime);
 				m_WallrunVerticalKick = Mathf.Lerp(m_WallrunVerticalKickAddition, 0f, t * 3f);
@@ -624,7 +635,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
                     if (Vector3.Dot(m_WallrunNormal.normalized, m_NewWallNormalToCheck.normalized) < m_WallDotThreshold)
                     {
-						//Debug.Log("hit another wall");
+						Debug.Log("hit another wall");
 						m_Jumping = true;
 						m_JumpCounter = 2;
 						brokeEarly = true;
@@ -642,14 +653,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
                 if (m_CharacterController.isGrounded)
                 {
-					//Debug.Log("grounded");
+					Debug.Log("grounded");
 					brokeEarly = true;
 					break;
                 }
 
                 if (m_Jumping)
                 {
-					//Debug.Log("jumped");
+					Debug.Log("jumped");
 					brokeEarly = true;
 					break;
                 }
@@ -658,7 +669,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 if (!Physics.SphereCast(transform.position, m_CharacterController.radius, -m_WallrunNormal, out trash,
 							   m_CharacterController.height / 2f + 1f, Physics.AllLayers, QueryTriggerInteraction.Ignore))
                 {
-					//Debug.Log("no more wall");
+					Debug.Log("no more wall");
 					m_Jumping = true;
 					m_JumpCounter = 2;
 					brokeEarly = true;
@@ -667,7 +678,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
 				if (m_CollisionFlags == CollisionFlags.Below)
 				{
-					//Debug.Log("hit the ground");
+					Debug.Log("hit the ground");
 					brokeEarly = true;
 					break;
 				}
@@ -676,7 +687,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 			//Debug.Log("Done wall running");
 			if (!brokeEarly)
 			{
-				//Debug.Log("out of time");
+				Debug.Log("out of time");
 				m_JumpCounter = 2;
 				m_Jumping = true;
 			}

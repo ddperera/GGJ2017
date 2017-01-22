@@ -69,8 +69,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1581496988792392}
-  m_LocalRotation: {x: -0, y: -0.99201286, z: -0, w: 0.12613675}
-  m_LocalPosition: {x: -29, y: -86, z: 158}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -3.15, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4921033447592358}
@@ -151,7 +151,7 @@ AudioSource:
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
-  DopplerLevel: 1
+  DopplerLevel: 0
   MinDistance: 1
   MaxDistance: 500
   Pan2D: 0
@@ -200,7 +200,7 @@ AudioSource:
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 4
+    m_RotationOrder: 0
   reverbZoneMixCustomCurve:
     serializedVersion: 2
     m_Curve:
@@ -320,12 +320,16 @@ MonoBehaviour:
   m_JumpBob:
     BobDuration: 0.2
     BobAmount: 0.1
-  m_StepInterval: 5
+  m_StepInterval: 8
   m_FootstepSounds:
-  - {fileID: 0}
-  - {fileID: 0}
-  m_JumpSound: {fileID: 8300000, guid: 5897aeed9b676024fbb8c694b421a861, type: 3}
-  m_LandSound: {fileID: 8300000, guid: 3b09d59f4499d45428baa7a21e954296, type: 3}
+  - {fileID: 8300000, guid: 7f365ec5c6eaad84ebe525c134cde3d2, type: 3}
+  - {fileID: 8300000, guid: f59a4e1f7943f4b4095d56870cd0833f, type: 3}
+  - {fileID: 8300000, guid: 238fdb04123464f4b81c6ea6200b9f5e, type: 3}
+  - {fileID: 8300000, guid: 226eabcaf36ce9749a4a8791f8092699, type: 3}
+  - {fileID: 8300000, guid: f691aeae934b1f945ad17ab7adc02714, type: 3}
+  m_JumpSound: {fileID: 8300000, guid: 3ad3860116e6cf845a82b89304d92672, type: 3}
+  m_LandSound: {fileID: 8300000, guid: d4ddf63f1fdb73047840581a4c579596, type: 3}
+  m_SlideSound: {fileID: 8300000, guid: e6731049e4ab56e4f84bee016dcb18df, type: 3}
   m_AirAccel: 0.025
   m_SlideSpeedBonusCurve:
     serializedVersion: 2

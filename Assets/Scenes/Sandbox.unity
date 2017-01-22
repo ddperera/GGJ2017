@@ -800,11 +800,6 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 114219438624128492, guid: a054ae4076e3a57499b4f8e319e03250,
-        type: 2}
-      propertyPath: m_FootstepSounds.Array.size
-      value: 5
-      objectReference: {fileID: 0}
     - target: {fileID: 4925857305688628, guid: a054ae4076e3a57499b4f8e319e03250, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -836,61 +831,6 @@ Prefab:
     - target: {fileID: 4925857305688628, guid: a054ae4076e3a57499b4f8e319e03250, type: 2}
       propertyPath: m_RootOrder
       value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 114219438624128492, guid: a054ae4076e3a57499b4f8e319e03250,
-        type: 2}
-      propertyPath: m_JumpSound
-      value: 
-      objectReference: {fileID: 8300000, guid: 3ad3860116e6cf845a82b89304d92672, type: 3}
-    - target: {fileID: 114219438624128492, guid: a054ae4076e3a57499b4f8e319e03250,
-        type: 2}
-      propertyPath: m_LandSound
-      value: 
-      objectReference: {fileID: 8300000, guid: d4ddf63f1fdb73047840581a4c579596, type: 3}
-    - target: {fileID: 114219438624128492, guid: a054ae4076e3a57499b4f8e319e03250,
-        type: 2}
-      propertyPath: m_FootstepSounds.Array.data[0]
-      value: 
-      objectReference: {fileID: 8300000, guid: 7f365ec5c6eaad84ebe525c134cde3d2, type: 3}
-    - target: {fileID: 114219438624128492, guid: a054ae4076e3a57499b4f8e319e03250,
-        type: 2}
-      propertyPath: m_FootstepSounds.Array.data[1]
-      value: 
-      objectReference: {fileID: 8300000, guid: f59a4e1f7943f4b4095d56870cd0833f, type: 3}
-    - target: {fileID: 114219438624128492, guid: a054ae4076e3a57499b4f8e319e03250,
-        type: 2}
-      propertyPath: m_FootstepSounds.Array.data[2]
-      value: 
-      objectReference: {fileID: 8300000, guid: 238fdb04123464f4b81c6ea6200b9f5e, type: 3}
-    - target: {fileID: 114219438624128492, guid: a054ae4076e3a57499b4f8e319e03250,
-        type: 2}
-      propertyPath: m_FootstepSounds.Array.data[3]
-      value: 
-      objectReference: {fileID: 8300000, guid: 226eabcaf36ce9749a4a8791f8092699, type: 3}
-    - target: {fileID: 114219438624128492, guid: a054ae4076e3a57499b4f8e319e03250,
-        type: 2}
-      propertyPath: m_FootstepSounds.Array.data[4]
-      value: 
-      objectReference: {fileID: 8300000, guid: f691aeae934b1f945ad17ab7adc02714, type: 3}
-    - target: {fileID: 114219438624128492, guid: a054ae4076e3a57499b4f8e319e03250,
-        type: 2}
-      propertyPath: m_StepInterval
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 114219438624128492, guid: a054ae4076e3a57499b4f8e319e03250,
-        type: 2}
-      propertyPath: m_SlideSound
-      value: 
-      objectReference: {fileID: 8300000, guid: e6731049e4ab56e4f84bee016dcb18df, type: 3}
-    - target: {fileID: 82210782078556494, guid: a054ae4076e3a57499b4f8e319e03250,
-        type: 2}
-      propertyPath: spreadCustomCurve.m_RotationOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 82210782078556494, guid: a054ae4076e3a57499b4f8e319e03250,
-        type: 2}
-      propertyPath: DopplerLevel
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a054ae4076e3a57499b4f8e319e03250, type: 2}

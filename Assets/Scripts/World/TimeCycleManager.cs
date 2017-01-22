@@ -16,7 +16,7 @@ public class TimeCycleManager : MonoBehaviour {
 		foreach (GameObject obj in objs)
 		{
 			TimeCycleListener listener = obj.GetComponentInChildren<TimeCycleListener>();
-			if (listener != null)
+			if (listener != null && !m_listeners.Contains(listener))
 			{
 				m_listeners.Add(listener);
 			}
@@ -24,16 +24,17 @@ public class TimeCycleManager : MonoBehaviour {
 	}
 	
 	void Update () {
-		if (Time.time <= m_lastCycleTime + secondsPerCycle)
+		if (Time.time >= m_lastCycleTime + secondsPerCycle)
 		{
 			m_lastCycleTime = Time.time;
 		}
 
 		foreach (TimeCycleListener listener in m_listeners)
 		{
-			if (Time.time <= m_lastCycleTime + secondsPerCycle - listener.cycleActionTime)
+			if (Time.time >= m_lastCycleTime + secondsPerCycle - listener.cycleActionTime + .05f)
 			{
 				listener.OnCycle();
+				//Debug.Log(listener + " cycling");
 			}
 		}
 	}

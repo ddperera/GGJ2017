@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Clickable
   - SpeedText
+  - TimeCycle
   layers:
   - Default
   - TransparentFX

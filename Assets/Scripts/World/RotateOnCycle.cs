@@ -15,7 +15,7 @@ public class RotateOnCycle : TimeCycleListener {
 
 	public override void OnCycle()
 	{
-		m_curCycleCount = m_curCycleCount + 1 % cycleActionFrequency;
+		m_curCycleCount = (m_curCycleCount + 1) % cycleActionFrequency;
 		if (m_canCycle && m_curCycleCount == 0)
 		{
 			StartCoroutine(Rotate());
@@ -29,8 +29,8 @@ public class RotateOnCycle : TimeCycleListener {
 
 		for (float t = 0f; t < cycleActionTime; t += Time.deltaTime)
 		{
-			transform.RotateAround(rotationRoot.position, rotationRoot.forward, rotationAmountPerCycle / (Time.deltaTime * cycleActionTime));
-			totalRot += rotationAmountPerCycle / (Time.deltaTime * cycleActionTime);
+			transform.RotateAround(rotationRoot.position, rotationRoot.forward, Time.deltaTime * rotationAmountPerCycle / (cycleActionTime));
+			totalRot += Time.deltaTime * rotationAmountPerCycle / (cycleActionTime);
 			yield return null;
 		}
 		transform.RotateAround(rotationRoot.position, rotationRoot.forward, rotationAmountPerCycle-totalRot);

@@ -80,6 +80,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 		private Vector3 m_LastFramePos;
 		private float m_WallrunVerticalKick;
 		private Text m_SpeedText;
+		private float m_LastWalljumpEnd;
 
 
 
@@ -110,6 +111,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_lastJumpTime = Time.time;
 			m_LastFramePos = transform.position;
 			m_SpeedText = GameObject.FindWithTag("SpeedText").GetComponent<Text>();
+			m_LastWalljumpEnd = Time.time;
 		}
 
 
@@ -147,7 +149,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
 			RaycastHit trash;
             if (!Physics.SphereCast(transform.position, m_CharacterController.radius, Vector3.down, out trash,
-							   m_CharacterController.height / 2f + .1f, Physics.AllLayers, QueryTriggerInteraction.Ignore) && !m_Jumping)
+							   m_CharacterController.height / 2f + .1f, Physics.AllLayers, QueryTriggerInteraction.Ignore) && !m_Jumping && m_CollisionFlags == CollisionFlags.None)
             {
                 m_MoveDir.y = 0f;
 				m_JumpCounter = 2;
@@ -254,7 +256,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 			else if (m_IsWallrunning)
 			{
 				m_MoveDir += Physics.gravity * m_GravityMultiplier * Time.fixedDeltaTime * m_WallrunGravityReduction + Vector3.up*m_WallrunVerticalKick;
-				if (m_MoveDir.y < 0f)
+				if (m_MoveDir.y < -.5f - m_WallrunVerticalKick)
 				{
 					m_MoveDir.y += m_WallrunVerticalKick;
 				}
@@ -266,16 +268,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
 				desiredMove *= speed;
 				Vector3 pushDir = desiredMove;
 
-				Vector3 reverseNormalMagnet = -m_WallrunNormal.normalized * m_StickToGroundForce;
+				Vector3 reverseNormalMagnet = -m_WallrunNormal.normalized * m_StickToGroundForce/4f;
 				
 				RaycastHit trash;
-				if (!Physics.SphereCast(transform.position, m_CharacterController.radius, -m_WallrunNormal, out trash,
+				if (Physics.SphereCast(transform.position, m_CharacterController.radius, -m_WallrunNormal, out trash,
 							   m_CharacterController.height / 2f + 1f, Physics.AllLayers, QueryTriggerInteraction.Ignore))
 				{
 					m_MoveDir.x = reverseNormalMagnet.x;
 					m_MoveDir.z = reverseNormalMagnet.z;
-					m_MoveDir.x += m_WallrunDirectionAlongWall.x * speed + pushDir.x / 4f;
-					m_MoveDir.z += m_WallrunDirectionAlongWall.z * speed + pushDir.z / 4f;
+					m_MoveDir.x += m_WallrunDirectionAlongWall.x * speed + pushDir.x * .25f;
+					m_MoveDir.z += m_WallrunDirectionAlongWall.z * speed + pushDir.z * .25f;
 				}
 
 				
@@ -315,9 +317,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
 					m_MoveDir.y = m_JumpSpeed;
 					if (m_IsWallrunning)
 					{
-						m_MoveDir.x = m_WallrunNormal.x * m_WallrunKickoffForce;
-						m_MoveDir.z = m_WallrunNormal.z * m_WallrunKickoffForce;
-						m_MoveDir.y += m_JumpSpeed / 4f;
+						m_MoveDir.x = m_WallrunNormal.x * m_WallrunKickoffForce + m_WallrunDirectionAlongWall.x/2f;
+						m_MoveDir.z = m_WallrunNormal.z * m_WallrunKickoffForce + m_WallrunDirectionAlongWall.z/2f;
+						m_MoveDir.y = 2f * m_JumpSpeed / 3f;
 					}
 					m_JumpCounter++;
 					PlayJumpSound();
@@ -553,6 +555,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private bool CanStartWallrun(ControllerColliderHit hit)
         {
+			if (Time.time - m_LastWalljumpEnd < 1f)
+			{
+				return false;
+			}
+
             if (m_CharacterController.isGrounded)
             {
                 return false;
@@ -581,7 +588,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 return false;
             }
 
-			Debug.Log(Vector3.Dot(m_MoveDir.normalized, -wallNormal));
+			//Debug.Log(Vector3.Dot(m_MoveDir.normalized, -wallNormal));
 			if (Vector3.Dot(m_MoveDir.normalized, -wallNormal) > m_WallDotThreshold)
 			{
 				return false;
@@ -620,7 +627,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
                     if (Vector3.Dot(m_WallrunNormal.normalized, m_NewWallNormalToCheck.normalized) < m_WallDotThreshold)
                     {
-                        m_Jumping = true;
+						//Debug.Log("hit another wall");
+						m_Jumping = true;
 						m_JumpCounter = 2;
 						brokeEarly = true;
 						break;
@@ -637,12 +645,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
                 if (m_CharacterController.isGrounded)
                 {
+					//Debug.Log("grounded");
 					brokeEarly = true;
 					break;
                 }
 
                 if (m_Jumping)
                 {
+					//Debug.Log("jumped");
 					brokeEarly = true;
 					break;
                 }
@@ -651,6 +661,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 if (!Physics.SphereCast(transform.position, m_CharacterController.radius, -m_WallrunNormal, out trash,
 							   m_CharacterController.height / 2f + 1f, Physics.AllLayers, QueryTriggerInteraction.Ignore))
                 {
+					//Debug.Log("no more wall");
 					m_Jumping = true;
 					m_JumpCounter = 2;
 					brokeEarly = true;
@@ -659,18 +670,21 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
 				if (m_CollisionFlags == CollisionFlags.Below)
 				{
+					//Debug.Log("hit the ground");
 					brokeEarly = true;
 					break;
 				}
                 yield return null;
             }
-			Debug.Log("Done wall running");
+			//Debug.Log("Done wall running");
 			if (!brokeEarly)
 			{
+				//Debug.Log("out of time");
 				m_JumpCounter = 2;
 				m_Jumping = true;
 			}
-            m_WallrunSpeedBonus = 0f;
+			m_LastWalljumpEnd = Time.time;
+			m_WallrunSpeedBonus = 0f;
 			m_WallrunVerticalKick = 0f;
 			m_IsWallrunning = false;
         }

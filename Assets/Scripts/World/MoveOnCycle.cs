@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class MoveOnCycle : TimeCycleListener {
 
-	public Transform endLocationMarker;
-	private Vector3 m_initialPosition;
+	public Vector3 movementAmount;
+	private Vector3 m_initialPosition, m_endPosition;
 	private bool m_atStart = true;
 
 	void Start()
@@ -14,11 +14,13 @@ public class MoveOnCycle : TimeCycleListener {
 		m_curCycleCount = 0;
 
 		m_initialPosition = transform.position;
+		m_endPosition = m_initialPosition + movementAmount;
+
 	}
 
 	public override void OnCycle()
 	{
-		m_curCycleCount = m_curCycleCount + 1 % cycleActionFrequency;
+		m_curCycleCount = (m_curCycleCount + 1) % cycleActionFrequency;
 		if (m_canCycle && m_curCycleCount == 0)
 		{
 			StartCoroutine(Move());
@@ -35,10 +37,10 @@ public class MoveOnCycle : TimeCycleListener {
 			{
 				t = 1f - t;
 			}
-			transform.position = Vector3.Lerp(m_initialPosition, endLocationMarker.transform.position, t);
+			transform.position = Vector3.Lerp(m_initialPosition, m_endPosition, t);
 			yield return null;
 		}
-		transform.position = m_atStart ? endLocationMarker.transform.position : m_initialPosition;
+		transform.position = m_atStart ? m_endPosition : m_initialPosition;
 		m_atStart = !m_atStart;
 
 		foreach (ParticleSystem p in cycleFinishedEmitters)

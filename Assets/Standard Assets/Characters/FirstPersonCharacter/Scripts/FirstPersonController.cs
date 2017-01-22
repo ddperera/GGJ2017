@@ -273,8 +273,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 				{
 					m_MoveDir.x = reverseNormalMagnet.x;
 					m_MoveDir.z = reverseNormalMagnet.z;
-					m_MoveDir.x += m_WallrunDirectionAlongWall.x * speed + pushDir.x * .25f;
-					m_MoveDir.z += m_WallrunDirectionAlongWall.z * speed + pushDir.z * .25f;
+					m_MoveDir.x += m_WallrunDirectionAlongWall.x * m_MaxWallrunSpeedBonus + pushDir.x * .25f;
+					m_MoveDir.z += m_WallrunDirectionAlongWall.z * m_MaxWallrunSpeedBonus + pushDir.z * .25f;
 				}
 
 				

@@ -33,11 +33,8 @@ public class MoveOnCycle : TimeCycleListener {
 
 		for (float t=0f; t<1f; t += Time.deltaTime / cycleActionTime)
 		{
-			if (!m_atStart)
-			{
-				t = 1f - t;
-			}
-			transform.position = Vector3.Lerp(m_initialPosition, m_endPosition, t);
+			float realT = m_atStart ? t : 1f - t;
+			transform.position = Vector3.Lerp(m_initialPosition, m_endPosition, realT);
 			yield return null;
 		}
 		transform.position = m_atStart ? m_endPosition : m_initialPosition;

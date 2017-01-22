@@ -18,7 +18,7 @@ MonoBehaviour:
       isPacked: 1
       materialId: 
       rotation: {x: -45, y: 45, z: 0}
-      scale: {x: 0.8, y: 1.2, z: 3}
+      scale: {x: 0.8, y: 1.2, z: 8}
       atlasRect:
         serializedVersion: 2
         x: 0.2507324
@@ -37,7 +37,7 @@ MonoBehaviour:
       isPacked: 1
       materialId: 
       rotation: {x: -45, y: 45, z: 0}
-      scale: {x: 0.8, y: 1.2, z: 3}
+      scale: {x: 0.8, y: 1.2, z: 8}
       atlasRect:
         serializedVersion: 2
         x: 0
@@ -56,7 +56,7 @@ MonoBehaviour:
       isPacked: 1
       materialId: 
       rotation: {x: -45, y: 45, z: 0}
-      scale: {x: 0.8, y: 1.2, z: 3}
+      scale: {x: 0.8, y: 1.2, z: 8}
       atlasRect:
         serializedVersion: 2
         x: 0.2507324
@@ -75,7 +75,7 @@ MonoBehaviour:
       isPacked: 1
       materialId: 
       rotation: {x: -45, y: 45, z: 0}
-      scale: {x: 0.8, y: 1.2, z: 3}
+      scale: {x: 0.8, y: 1.2, z: 8}
       atlasRect:
         serializedVersion: 2
         x: 0.5014648
@@ -94,7 +94,7 @@ MonoBehaviour:
       isPacked: 1
       materialId: 
       rotation: {x: -45, y: 45, z: 0}
-      scale: {x: 0.8, y: 1.2, z: 3}
+      scale: {x: 0.8, y: 1.2, z: 8}
       atlasRect:
         serializedVersion: 2
         x: 0
@@ -113,7 +113,7 @@ MonoBehaviour:
       isPacked: 1
       materialId: 
       rotation: {x: -45, y: 45, z: 0}
-      scale: {x: 0.8, y: 1.2, z: 3}
+      scale: {x: 0.8, y: 1.2, z: 8}
       atlasRect:
         serializedVersion: 2
         x: 0
@@ -142,7 +142,7 @@ MonoBehaviour:
 
     (-45.0, 45.0, 0.0)
 
-    (0.8, 1.2, 3.0)
+    (0.8, 1.2, 8.0)
 
     (0.2507324, 0.2507324, 0.25, 0.25)
 
@@ -169,7 +169,7 @@ MonoBehaviour:
 
     (-45.0, 45.0, 0.0)
 
-    (0.8, 1.2, 3.0)
+    (0.8, 1.2, 8.0)
 
     (0, 0, 0.25, 0.25)
 
@@ -196,7 +196,7 @@ MonoBehaviour:
 
     (-45.0, 45.0, 0.0)
 
-    (0.8, 1.2, 3.0)
+    (0.8, 1.2, 8.0)
 
     (0.2507324, 0, 0.25, 0.25)
 
@@ -223,7 +223,7 @@ MonoBehaviour:
 
     (-45.0, 45.0, 0.0)
 
-    (0.8, 1.2, 3.0)
+    (0.8, 1.2, 8.0)
 
     (0.5014648, 0, 0.25, 0.25)
 
@@ -250,7 +250,7 @@ MonoBehaviour:
 
     (-45.0, 45.0, 0.0)
 
-    (0.8, 1.2, 3.0)
+    (0.8, 1.2, 8.0)
 
     (0, 0.2507324, 0.25, 0.25)
 
@@ -277,7 +277,7 @@ MonoBehaviour:
 
     (-45.0, 45.0, 0.0)
 
-    (0.8, 1.2, 3.0)
+    (0.8, 1.2, 8.0)
 
     (0, 0.5014648, 0.25, 0.25)
 

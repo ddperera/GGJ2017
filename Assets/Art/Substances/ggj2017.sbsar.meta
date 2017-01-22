@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: b74f709a0a7982e4fbd027d5e8f69c24
-timeCreated: 1485077482
+timeCreated: 1485107662
 licenseType: Free
 SubstanceImporter:
   serializedVersion: 5
@@ -223,13 +223,13 @@ SubstanceImporter:
       material: {instanceID: 0}
       baseUID: 1895675578
     - shaderProp:
-        name: _ParallaxMap
-      material: {instanceID: 0}
-      baseUID: 1957953008
-    - shaderProp:
         name: _OcclusionMap
       material: {instanceID: 0}
       baseUID: 1957953006
+    - shaderProp:
+        name: _ParallaxMap
+      material: {instanceID: 0}
+      baseUID: 1957953008
     buildTargetSettings:
     - serializedVersion: 2
       buildTarget: 
@@ -262,7 +262,7 @@ SubstanceImporter:
         texture: {instanceID: 0}
     - name: PlasterIntensity
       value:
-        scalar[0]: 0.5
+        scalar[0]: 1.19
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
@@ -423,13 +423,13 @@ SubstanceImporter:
       material: {instanceID: 0}
       baseUID: 2876450461
     - shaderProp:
-        name: _ParallaxMap
-      material: {instanceID: 0}
-      baseUID: 2940069447
-    - shaderProp:
         name: _OcclusionMap
       material: {instanceID: 0}
       baseUID: 2940069493
+    - shaderProp:
+        name: _ParallaxMap
+      material: {instanceID: 0}
+      baseUID: 2940069447
     - shaderProp:
         name: _SpecGlossMap
       material: {instanceID: 0}
@@ -473,21 +473,21 @@ SubstanceImporter:
         texture: {instanceID: 0}
     - name: EdgeWear
       value:
-        scalar[0]: 0.1
+        scalar[0]: 0.423
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
         texture: {instanceID: 0}
     - name: LargeDivetsAmount
       value:
-        scalar[0]: 0.35
+        scalar[0]: 0.883
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
         texture: {instanceID: 0}
     - name: SurfaceGraininess
       value:
-        scalar[0]: 0.1
+        scalar[0]: 0.332
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
@@ -648,13 +648,13 @@ SubstanceImporter:
       material: {instanceID: 0}
       baseUID: 610712097
     - shaderProp:
-        name: _ParallaxMap
-      material: {instanceID: 0}
-      baseUID: 539644660
-    - shaderProp:
         name: _OcclusionMap
       material: {instanceID: 0}
       baseUID: 539644618
+    - shaderProp:
+        name: _ParallaxMap
+      material: {instanceID: 0}
+      baseUID: 539644660
     - shaderProp:
         name: _SpecGlossMap
       material: {instanceID: 0}

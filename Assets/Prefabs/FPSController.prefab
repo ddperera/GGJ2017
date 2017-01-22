@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 114219438624128492}
   - component: {fileID: 54057715081298708}
   - component: {fileID: 82210782078556494}
+  - component: {fileID: 114102531294033662}
   m_Layer: 0
   m_Name: FPSController
   m_TagString: Untagged
@@ -68,7 +69,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1581496988792392}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 10.089999, z: 0}
+  m_LocalPosition: {x: -35, y: -10, z: 216}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4921033447592358}
@@ -211,6 +212,17 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+--- !u!114 &114102531294033662
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1581496988792392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2a989f3ef1c2324db7c7e47c6599275, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114219438624128492
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -341,7 +353,14 @@ MonoBehaviour:
   m_SlideDuration: 1.5
   m_StandUpDuration: 0.25
   m_CanInterruptPercent: 0.3
-  m_MaxSlideSpeedBonusAmt: 5
+  m_MeteorVel: 10
+  m_MaxSlideSpeedBonusAmt: 10
+  m_WallrunDuration: 1.5
+  m_MinHorizontalWallrunThreshold: 2
+  m_WallDotThreshold: 0.7
+  m_WallrunGravityReduction: 0.5
+  m_MaxWallrunSpeedBonus: 20
+  m_WallrunKickoffForce: 8
 --- !u!124 &124216735838584392
 Behaviour:
   m_ObjectHideFlags: 1

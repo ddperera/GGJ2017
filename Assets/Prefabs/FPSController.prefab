@@ -235,7 +235,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsWalking: 0
-  m_WalkSpeed: 5
+  m_WalkSpeed: 10
   m_RunSpeed: 10
   m_RunstepLenghten: 0.7
   m_JumpSpeed: 10
@@ -250,7 +250,7 @@ MonoBehaviour:
     smooth: 0
     smoothTime: 5
     lockCursor: 1
-  m_UseFovKick: 1
+  m_UseFovKick: 0
   m_FovKick:
     Camera: {fileID: 0}
     originalFov: 0
@@ -353,14 +353,15 @@ MonoBehaviour:
   m_SlideDuration: 1.5
   m_StandUpDuration: 0.25
   m_CanInterruptPercent: 0.3
-  m_MeteorVel: 10
+  m_MeteorVel: 20
   m_MaxSlideSpeedBonusAmt: 10
   m_WallrunDuration: 1.5
-  m_MinHorizontalWallrunThreshold: 2
-  m_WallDotThreshold: 0.7
+  m_MinHorizontalWallrunThreshold: 6
+  m_WallDotThreshold: 0.65
   m_WallrunGravityReduction: 0.5
-  m_MaxWallrunSpeedBonus: 20
-  m_WallrunKickoffForce: 8
+  m_MaxWallrunSpeedBonus: 4
+  m_WallrunKickoffForce: 3
+  m_WallrunVerticalKickAddition: 0.65
 --- !u!124 &124216735838584392
 Behaviour:
   m_ObjectHideFlags: 1

@@ -109,7 +109,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_NeedToCheckNewWallNormal = false;
             m_lastJumpTime = Time.time;
 			m_LastFramePos = transform.position;
-			m_SpeedText = GameObject.FindWithTag("SpeedText").GetComponent<Text>();
+			//m_SpeedText = GameObject.FindWithTag("SpeedText").GetComponent<Text>();
 		}
 
 
@@ -186,7 +186,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 			m_LastFrameVel = (transform.position - m_LastFramePos)/Time.fixedDeltaTime;
 			m_LastFramePos = transform.position;
 			float metersPerSecond = new Vector3(m_LastFrameVel.x, 0f, m_LastFrameVel.z).magnitude;
-			m_SpeedText.text = "Speed: " + Mathf.RoundToInt(metersPerSecond);
+			//m_SpeedText.text = "Speed: " + Mathf.RoundToInt(metersPerSecond);
 
 			float speed;
 			GetInput(out speed);

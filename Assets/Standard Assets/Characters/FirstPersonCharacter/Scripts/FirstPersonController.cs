@@ -36,6 +36,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private float m_MeteorVel;
         [SerializeField] private float m_MaxSlideSpeedBonusAmt;
         [SerializeField] private float m_WallrunDuration;
+        [SerializeField] private float m_MinHorizontalWallrunThreshold;
+        [SerializeField] private float m_WallDotThreshold;
+        [SerializeField] private float m_WallrunGravityReduction;
+        [SerializeField] private float m_MaxWallrunSpeedBonus;
+        [SerializeField] private float m_WallrunKickoffForce;
 
         private Camera m_Camera;
         private bool m_Jump;
@@ -61,6 +66,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private bool m_IsSlideLocked;
         private bool m_Spiking;
         private bool m_IsWallrunning;
+        private Vector3 m_WallrunNormal;
+        private Vector3 m_WallrunDirectionAlongWall;
+        private bool m_NeedToCheckNewWallNormal;
+        private ControllerColliderHit m_NewWallHitToCheck;
+        private float m_WallrunSpeedBonus;
+        private float m_lastJumpTime;
+        private GameObject m_currentWallObj;
+
+
+
 
         // Use this for initialization
         private void Start()
@@ -84,6 +99,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_StandUpPercent = (m_SlideDuration - m_StandUpDuration) / m_SlideDuration;
             m_CanInterruptSlide = false;
             m_IsWallrunning = false;
+            m_NeedToCheckNewWallNormal = false;
+            m_lastJumpTime = Time.time;
         }
 
 
@@ -96,9 +113,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_GroundedHistory[2] = m_GroundedHistory[1];
             m_GroundedHistory[1] = m_GroundedHistory[0];
             m_GroundedHistory[0] = m_CharacterController.isGrounded;
-
             // the jump state needs to read here to make sure it is not missed
-            if (!m_Jump && (IsFirmlyGrounded() || m_Jumping))
+            if (!m_Jump && (IsFirmlyGrounded() || m_Jumping || m_IsWallrunning) && Time.time - m_lastJumpTime > .35f)
             {
                 if(m_Sliding)
                 {
@@ -111,7 +127,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 {
                     m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
                 }
-                
             }
 
             if (!m_PreviouslyGrounded && m_CharacterController.isGrounded)
@@ -256,7 +271,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 }
                 else
                 {
-                    m_MoveDir.x = desiredMove.x / 2.0f;
+                    m_MoveDir = transform.InverseTransformDirection(m_MoveDir);
+                    m_MoveDir.x = transform.InverseTransformDirection(desiredMove).x / 3.0f;
+                    m_MoveDir = transform.TransformDirection(m_MoveDir);
                 }
             }
             else
@@ -291,6 +308,18 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 m_MoveDir.y = -m_MeteorVel;
             }
+            else if (m_IsWallrunning)
+            {
+                m_MoveDir += Physics.gravity * m_GravityMultiplier * Time.fixedDeltaTime * m_WallrunGravityReduction;
+
+                Vector3 reverseNormalMagnet = -m_WallrunNormal.normalized * m_StickToGroundForce;
+                m_MoveDir.x = reverseNormalMagnet.x;
+                m_MoveDir.z = reverseNormalMagnet.z;
+
+                m_MoveDir.y = 0f;
+
+                m_MoveDir += m_WallrunDirectionAlongWall * m_WallrunSpeedBonus;
+            }
             else
             {
                 m_MoveDir += Physics.gravity*m_GravityMultiplier*Time.fixedDeltaTime;
@@ -299,6 +328,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             if (m_Jump)
             {
                 m_Jump = false;
+                m_lastJumpTime = Time.time;
                 if (m_Jumping)
                 {
                     switch (m_JumpCounter)
@@ -321,6 +351,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 }
                 else
                 {
+                    if (m_IsWallrunning)
+                    {
+                        m_MoveDir = m_WallrunNormal * m_WallrunKickoffForce;
+                    }
                     m_MoveDir.y = m_JumpSpeed;
                     m_JumpCounter++;
                     PlayJumpSound();
@@ -448,10 +482,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
             if (m_CollisionFlags == CollisionFlags.Sides)
             {
                 GameObject wall = hit.gameObject;
-                
+
                 if(CanStartWallrun(hit))
                 {
-                    StartCoroutine("Wallrun");
+                    StartCoroutine(Wallrun(hit));
+                }
+
+                if (m_IsWallrunning && hit.collider.gameObject != m_currentWallObj)
+                {
+                    m_NeedToCheckNewWallNormal = true;
+                    m_NewWallHitToCheck = hit;
+                    Debug.Log("Hit wall: " + hit.collider.gameObject);
                 }
             }
 
@@ -472,6 +513,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private bool CanStartWallrun(ControllerColliderHit hit)
         {
+            if (m_CharacterController.isGrounded)
+            {
+                return false;
+            }
+
+            if (!m_Jumping)
+            {
+                return false;
+            }
+
             if (m_IsWallrunning)
             {
                 return false;
@@ -482,17 +533,74 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 return false;
             }
 
+            Vector3 wallNormal = hit.normal;
+            Vector3 componentAlongWall = Vector3.ProjectOnPlane(m_MoveDir, wallNormal);
+            Vector3 parallelToFloor = new Vector3(componentAlongWall.x, 0f, componentAlongWall.z);
+
+            if (Vector3.Magnitude(parallelToFloor) < m_MinHorizontalWallrunThreshold)
+            {
+                return false;
+            }
+
             return true;
-
-
         }
 
-        private IEnumerator Wallrun()
+        private IEnumerator Wallrun(ControllerColliderHit hit)
         {
+            m_IsWallrunning = true;
+            m_WallrunNormal = hit.normal;
+            m_JumpCounter = 1;
+            m_Jumping = false;
+            m_currentWallObj = hit.collider.gameObject;
+            Vector3 componentAlongWall = Vector3.ProjectOnPlane(m_MoveDir, m_WallrunNormal);
+            m_WallrunDirectionAlongWall = new Vector3(componentAlongWall.x, 0f, componentAlongWall.z);
+            m_WallrunDirectionAlongWall.Normalize();
+
+            m_WallrunSpeedBonus = 0f;
+
             for (float t = 0; t < m_WallrunDuration; t += Time.fixedDeltaTime)
             {
+                m_WallrunSpeedBonus = Mathf.Lerp(m_WallrunSpeedBonus, m_MaxWallrunSpeedBonus, .7f);
+
+                if (m_NeedToCheckNewWallNormal)
+                {
+                    m_NeedToCheckNewWallNormal = false;
+
+                    Debug.Log(Vector3.Dot(m_WallrunNormal, m_NewWallHitToCheck.normal));
+                    if (Vector3.Dot(m_WallrunNormal, m_NewWallHitToCheck.normal) < m_WallDotThreshold)
+                    {
+                        m_Jumping = true;
+                        break;
+                    }
+                    else
+                    {
+                        m_WallrunNormal = m_NewWallHitToCheck.normal;
+                        componentAlongWall = Vector3.ProjectOnPlane(m_MoveDir, m_WallrunNormal);
+                        m_WallrunDirectionAlongWall = new Vector3(componentAlongWall.x, 0f, componentAlongWall.z);
+                        m_WallrunDirectionAlongWall.Normalize();
+                        m_currentWallObj = m_NewWallHitToCheck.collider.gameObject;
+                    }
+                }
+
+                if (m_CharacterController.isGrounded)
+                {
+                    break;
+                }
+
+                if (m_Jumping)
+                {
+                    break;
+                }
+
+                if (m_CollisionFlags == CollisionFlags.None)
+                {
+                    break;
+                }
                 yield return null;
             }
+
+            m_WallrunSpeedBonus = 0f;
+            m_IsWallrunning = false;
         }
     }
 }

@@ -12,7 +12,7 @@ public class ClickableTarget : Clickable {
 
 	void Start()
 	{
-		initialColor = GetComponent<Renderer>().material.color;
+		initialColor = GetComponent<Renderer>().material.GetColor("_Color");
 	}
 
 	override public void OnClick()
@@ -23,12 +23,28 @@ public class ClickableTarget : Clickable {
 	public void SetClicked()
 	{
 		hasBeenClicked = true;
-		GetComponent<Renderer>().material.color = clickColor;
+		StartCoroutine(FadeOut());
 	}
 
 	public void SetUnclicked()
 	{
 		hasBeenClicked = false;
-		GetComponent<Renderer>().material.color = initialColor;
+		GetComponent<Renderer>().material.SetColor("_Color", initialColor);
+		GetComponent<Renderer>().material.SetFloat("_FadeAmount", 0f);
+	}
+
+	private IEnumerator FadeOut()
+	{
+		Color c = initialColor;
+		for (float t=0f; t<1f; t += Time.deltaTime / .5f)
+		{
+			yield return null;
+			c = Color.Lerp(initialColor, clickColor, t);
+			GetComponent<Renderer>().material.SetColor("_Color", c);
+			GetComponent<Renderer>().material.SetFloat("_FadeAmount", t);
+		}
+		c = clickColor;
+		GetComponent<Renderer>().material.SetColor("_Color", c);
+		GetComponent<Renderer>().material.SetFloat("_FadeAmount", 1f);
 	}
 }

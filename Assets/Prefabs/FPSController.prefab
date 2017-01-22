@@ -69,7 +69,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1581496988792392}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -35, y: -10, z: 216}
+  m_LocalPosition: {x: 4, y: -10, z: 17}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4921033447592358}
@@ -235,7 +235,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsWalking: 0
-  m_WalkSpeed: 10
+  m_WalkSpeed: 8
   m_RunSpeed: 10
   m_RunstepLenghten: 0.7
   m_JumpSpeed: 10
@@ -350,8 +350,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
-  m_SlideDuration: 1.5
-  m_StandUpDuration: 0.25
+  m_SlideDuration: 0.85
+  m_StandUpDuration: 0.2
   m_CanInterruptPercent: 0.3
   m_MeteorVel: 20
   m_MaxSlideSpeedBonusAmt: 10

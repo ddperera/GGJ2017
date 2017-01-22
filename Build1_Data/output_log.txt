@@ -1,0 +1,60 @@
+Initialize engine version: 5.5.0f3 (38b4efef76f0)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: NVIDIA GeForce GTX 960M (ID=0x139b)
+    Vendor:   NVIDIA
+    VRAM:     3072 MB
+    Driver:   20.19.15.4364
+Begin MonoManager ReloadAssembly
+Platform assembly: C:\Users\sirla\Documents\Noose\Build1_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading C:\Users\sirla\Documents\Noose\Build1_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\Users\sirla\Documents\Noose\Build1_Data\Managed\Assembly-CSharp-firstpass.dll (this message is harmless)
+Loading C:\Users\sirla\Documents\Noose\Build1_Data\Managed\Assembly-CSharp-firstpass.dll into Unity Child Domain
+Platform assembly: C:\Users\sirla\Documents\Noose\Build1_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\Users\sirla\Documents\Noose\Build1_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\Users\sirla\Documents\Noose\Build1_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading C:\Users\sirla\Documents\Noose\Build1_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: C:\Users\sirla\Documents\Noose\Build1_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading C:\Users\sirla\Documents\Noose\Build1_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+Platform assembly: C:\Users\sirla\Documents\Noose\Build1_Data\Managed\UnityEngine.PlaymodeTestsRunner.dll (this message is harmless)
+Loading C:\Users\sirla\Documents\Noose\Build1_Data\Managed\UnityEngine.PlaymodeTestsRunner.dll into Unity Child Domain
+Platform assembly: C:\Users\sirla\Documents\Noose\Build1_Data\Managed\ProBuilderCore-Unity5.dll (this message is harmless)
+Loading C:\Users\sirla\Documents\Noose\Build1_Data\Managed\ProBuilderCore-Unity5.dll into Unity Child Domain
+Platform assembly: C:\Users\sirla\Documents\Noose\Build1_Data\Managed\ProBuilderMeshOps-Unity5.dll (this message is harmless)
+Loading C:\Users\sirla\Documents\Noose\Build1_Data\Managed\ProBuilderMeshOps-Unity5.dll into Unity Child Domain
+Platform assembly: C:\Users\sirla\Documents\Noose\Build1_Data\Managed\KDTree.dll (this message is harmless)
+Loading C:\Users\sirla\Documents\Noose\Build1_Data\Managed\KDTree.dll into Unity Child Domain
+Platform assembly: C:\Users\sirla\Documents\Noose\Build1_Data\Managed\pb_Stl.dll (this message is harmless)
+Loading C:\Users\sirla\Documents\Noose\Build1_Data\Managed\pb_Stl.dll into Unity Child Domain
+Platform assembly: C:\Users\sirla\Documents\Noose\Build1_Data\Managed\Triangle.dll (this message is harmless)
+Loading C:\Users\sirla\Documents\Noose\Build1_Data\Managed\Triangle.dll into Unity Child Domain
+- Completed reload, in  0.030 seconds
+Platform assembly: C:\Users\sirla\Documents\Noose\Build1_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: C:\Users\sirla\Documents\Noose\Build1_Data\Managed\System.dll (this message is harmless)
+desktop: 1920x1080 59Hz; virtual: 4800x1350 at -2400,0
+<RI> Initializing input.
+<RI> Input initialized.
+<RI> Initialized touch support.
+The referenced script on this Behaviour (Game Object 'Canvas') is missing!
+ 
+(Filename:  Line: 1754)
+
+UnloadTime: 0.921679 ms
+Setting up 2 worker threads for Enlighten.
+  Thread -> id: 1e04 -> priority: 1 
+  Thread -> id: 26b0 -> priority: 1 
+Unloading 5 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 5.295012 ms
+
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2009.
+Total: 0.355950 ms (FindLiveObjects: 0.097185 ms CreateObjectMapping: 0.039506 ms MarkObjects: 0.209777 ms  DeleteObjects: 0.009481 ms)
+
+(9.0, 3.0, 7.0)
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+(9.0, 3.0, 7.0)
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+

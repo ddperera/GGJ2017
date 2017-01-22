@@ -33,7 +33,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private float m_SlideDuration;
         [SerializeField] private float m_StandUpDuration;
         [SerializeField] private float m_CanInterruptPercent;
+        [SerializeField] private float m_MeteorVel;
         [SerializeField] private float m_MaxSlideSpeedBonusAmt;
+        [SerializeField] private float m_WallrunDuration;
 
         private Camera m_Camera;
         private bool m_Jump;
@@ -57,6 +59,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private float m_StandUpPercent;
         private bool m_CanInterruptSlide;
         private bool m_IsSlideLocked;
+        private bool m_Spiking;
+        private bool m_IsWallrunning;
 
         // Use this for initialization
         private void Start()
@@ -79,6 +83,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_SlideSpeedBonus = 0f;
             m_StandUpPercent = (m_SlideDuration - m_StandUpDuration) / m_SlideDuration;
             m_CanInterruptSlide = false;
+            m_IsWallrunning = false;
         }
 
 
@@ -102,7 +107,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                         m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
                     }
                 }
-                else
+                else if (!m_Spiking)
                 {
                     m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
                 }
@@ -130,13 +135,38 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             if (CrossPlatformInputManager.GetButtonDown("Slide"))
             {
-                if (!m_Sliding && m_CharacterController.isGrounded && !m_Jump)
+                if(m_CharacterController.isGrounded)
                 {
-                    transform.localScale = new Vector3(1.0f, 0.5f, 1.0f);
-                    m_Crouched = true;
-                    StartCoroutine("Slide");
+                    if (!m_Sliding && !m_Jump)
+                    {
+                        StartCoroutine("Slide");
+                    }
                 }
+                else
+                {
+                    if(!m_Spiking && !m_Jump)
+                    {
+                        StartCoroutine("Spike");
+                    }
+                }
+                
             }
+        }
+
+        private IEnumerator Spike()
+        {
+            m_Spiking = true;
+            m_IsSlideLocked = true;
+
+            transform.localScale = new Vector3(1.0f, 0.5f, 1.0f);
+
+            while(!m_CharacterController.isGrounded)
+            {
+                yield return null;
+            }
+
+            StartCoroutine("Slide");
+            m_Spiking = false;
         }
 
         private IEnumerator Slide()
@@ -146,6 +176,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_CanInterruptSlide = false;
             bool standUpHasRun = false;
 
+            transform.localScale = new Vector3(1.0f, 0.5f, 1.0f);
+            
             for (float t = 0; t <= 1; t += Time.fixedDeltaTime / m_SlideDuration)
             {
                 m_SlideSpeedBonus = m_SlideSpeedBonusCurve.Evaluate(t) * m_MaxSlideSpeedBonusAmt;
@@ -169,8 +201,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private IEnumerator StandUp()
         {
-            Debug.Log(transform.position.x);
-
             m_MidStandUp = true;
             Vector3 standDeltaVec = new Vector3(1.0f, 0.5f, 1.0f);
 
@@ -256,6 +286,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
             if (m_CharacterController.isGrounded)
             {
                 m_MoveDir.y = -m_StickToGroundForce;
+            }
+            else if (m_Spiking)
+            {
+                m_MoveDir.y = -m_MeteorVel;
             }
             else
             {
@@ -411,6 +445,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void OnControllerColliderHit(ControllerColliderHit hit)
         {
+            if (m_CollisionFlags == CollisionFlags.Sides)
+            {
+                GameObject wall = hit.gameObject;
+                
+                if(CanStartWallrun(hit))
+                {
+                    StartCoroutine("Wallrun");
+                }
+            }
+
             Rigidbody body = hit.collider.attachedRigidbody;
             //dont move the rigidbody if the character is on top of it
             if (m_CollisionFlags == CollisionFlags.Below)
@@ -422,7 +466,33 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 return;
             }
+
             body.AddForceAtPosition(m_CharacterController.velocity*0.1f, hit.point, ForceMode.Impulse);
+        }
+
+        private bool CanStartWallrun(ControllerColliderHit hit)
+        {
+            if (m_IsWallrunning)
+            {
+                return false;
+            }
+
+            if (hit.gameObject.GetComponent<Wallrunnable>() == null)
+            {
+                return false;
+            }
+
+            return true;
+
+
+        }
+
+        private IEnumerator Wallrun()
+        {
+            for (float t = 0; t < m_WallrunDuration; t += Time.fixedDeltaTime)
+            {
+                yield return null;
+            }
         }
     }
 }
